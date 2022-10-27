@@ -3,19 +3,30 @@ grammar Javascript;
 program: statementList+ # Program_Start;
 
 statementList:
-	block				# Statement_List_Block
-	| variableStatement	# Statement_List_Variable_Statement
-	| emptyStatement	# Statement_List_Empty_Statement;
+	block					# Statement_List_Block
+	| variableStatement		# Statement_List_Variable_Statement
+	| emptyStatement		# Statement_List_Empty_Statement
+	| expressionStatement	# Statement_List_Expression_Statement
+	| continueStatement		# Statement_List_Continue
+	| breakStatement		# Statement_List_Break
+	| returnStatement		# Statement_List_Return;
 
 block: '{' statementList+ '}' # Block_Statement_List;
 emptyStatement: SemiColon # Empty_Statement;
+
+expressionStatement: expressionSequence # Expression_Statement;
+
+continueStatement: Continue;
+breakStatement: Break;
+returnStatement:
+	Return expression = expressionSequence # Return_Statement;
 
 singleExpression:
 	New class_name = singleExpression new_arguments = arguments #
 		Single_Expression_Instantiate_With_Args
 	| New class_name = singleExpression # Single_Expression_Instantiate
 	// | anonymousFunction
-	| function_name = singleExpression function_arguments = arguments					# Single_Expression_Call
+	| function_name = singleExpression function_arguments = arguments				# Single_Expression_Call
 	| Delete expression = singleExpression											# Single_Expression_Delete
 	| Typeof expression = singleExpression											# Single_Expression_Typeof
 	| expression = singleExpression '++'											# Single_Expression_Post_Increment
@@ -53,6 +64,7 @@ singleExpression:
 		Single_Expression_Assignment_Operator
 	| Import '(' exp = singleExpression ')'	# Single_Expression_Import
 	| Super									# Single_Expression_Super
+	| VariableName							# Single_Expression_Variable
 	| literal								# Single_Expression_Literal
 	| arrayLiteral							# Single_Expression_Array_Literal
 	| objectLiteral							# Single_Expression_Object_Literal
@@ -75,7 +87,8 @@ assignmentOperator:
 	| '|='
 	| '**=';
 
-arguments: '(' (argument (',' argument)* ','?)? ')' # Arguments_Rule;
+arguments:
+	'(' (argument (',' argument)* ','?)? ')' # Arguments_Rule;
 
 argument: (singleExpression) # Argument_Rule;
 
@@ -121,6 +134,9 @@ eos: SemiColon;
 
 WhiteSapce: [\n ] -> skip;
 SemiColon: ';';
+Return: 'return';
+Break: 'break';
+Continue: 'continue';
 Import: 'import';
 Super: 'super';
 In: 'in';

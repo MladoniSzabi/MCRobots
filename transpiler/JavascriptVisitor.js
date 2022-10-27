@@ -1,4 +1,4 @@
-import JavascriptVisitor from "../lib/JavascriptVisitor.js";
+import JavascriptVisitor from "../lib/JavascriptVisitor.js"
 
 export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
@@ -26,6 +26,42 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     }
 
 
+    // Visit a parse tree produced by JavascriptParser#Statement_List_Continue.
+    visitStatement_List_Continue(ctx) {
+        return 'continue'
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Statement_List_Break.
+    visitStatement_List_Break(ctx) {
+        return 'break'
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Statement_List_Return.
+    visitStatement_List_Return(ctx) {
+        return this.visitChildren(ctx)[0];
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Statement_List_Expression_Statement.
+    visitStatement_List_Expression_Statement(ctx) {
+        return this.visitChildren(ctx).join('\n')
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Return_Statement.
+    visitReturn_Statement(ctx) {
+        return 'return ' + this.visit(ctx.expression);
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Expression_Statement.
+    visitExpression_Statement(ctx) {
+        return this.visitChildren(ctx).join('\n')
+    }
+
+
     // Visit a parse tree produced by JavascriptParser#Block_Statement_List.
     visitBlock_Statement_List(ctx) {
         return this.visitChildren(ctx).join('\n')
@@ -40,7 +76,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     //TODO:
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Instantiate_With_Args.
     visitSingle_Expression_Instantiate_With_Args(ctx) {
-        return this.visit(ctx.class_name) + '.new '  + this.visit(new_arguments)
+        return this.visit(ctx.class_name) + '.new ' + this.visit(new_arguments)
     }
 
 
@@ -204,14 +240,12 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Assignment.
     visitSingle_Expression_Assignment(ctx) {
-        console.log(1)
         return this.visit(ctx.exp1) + '=' + this.visit(ctx.exp2)
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Assignment_Operator.
     visitSingle_Expression_Assignment_Operator(ctx) {
-        console.log(ctx.operator.getText())
         switch (ctx.operator.getText()) {
             case '*=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') * javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
@@ -280,9 +314,15 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     }
 
 
-    // Visit a parse tree produced by JavascriptParser#Expression_Sequence.
-    visitExpression_Sequence(ctx) {
-        return this.visitChildren(ctx).join(', ')
+    // Visit a parse tree produced by JavascriptParser#Single_Expression_Parenthesis.
+    visitSingle_Expression_Parenthesis(ctx) {
+        return '(' + this.visit(ctx.expr) + ')'
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Single_Expression_Variable.
+    visitSingle_Expression_Variable(ctx) {
+        return ctx.getText()
     }
 
 
@@ -340,7 +380,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let propertiesAsStrings = []
         let properties = this.visitChildren(ctx)
         for (let prop of properties) {
-            if(prop == undefined) {
+            if (prop == undefined) {
                 continue
             }
             propertiesAsStrings.push(prop.name + " = " + prop.value)
@@ -389,7 +429,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let variable_values = []
         let declarations = this.visitChildren(ctx).splice(1)
         for (let v of declarations) {
-            if(v == undefined) {
+            if (v == undefined) {
                 continue
             }
             variable_names.push(v.variable_name)
@@ -429,7 +469,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Literal_Boolean.
     visitLiteral_Boolean(ctx) {
-        return ctx.getText();
+        return ctx.getText()
     }
 
 
@@ -478,7 +518,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         }
 
         let finalValue
-        if(decimalPartLength != 0) {
+        if (decimalPartLength != 0) {
             finalValue = (integerPart + decimalPart / decimalPartLength) * (10 ** exponent)
         } else {
             finalValue = integerPart * (10 ** exponent)
@@ -581,7 +621,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#eos.
     visitEos(ctx) {
-        return "";
+        return ""
     }
 
 }
