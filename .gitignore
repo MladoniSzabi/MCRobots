@@ -1,7 +1,4 @@
-lib/Javascript*.interp
-lib/Javascript*.tokens
-lib/JavascriptLexer.js
-lib/JavascriptParser.js
+lib/
 transpiler/antlr*.jar
 transpiler/.antlr
 grun

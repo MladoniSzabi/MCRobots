@@ -10,7 +10,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Statement_List_Block.
     visitStatement_List_Block(ctx) {
-        return this.visitChildren(ctx).join('\n')
+        return this.visitChildren(ctx).filter(x=>x!==undefined).join('\n')
     }
 
 
@@ -41,6 +41,64 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Statement_List_Return.
     visitStatement_List_Return(ctx) {
         return this.visitChildren(ctx)[0];
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Statement_List_Function_Declaration.
+    visitStatement_List_Function_Declaration(ctx) {
+        return this.visitChildren(ctx)[0]
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Function_Declaration.
+    visitFunction_Declaration(ctx) {
+        let output = 'function ' + ctx.function_name.text + '(arguments)\n\n'
+        let args = this.visit(ctx.args)
+        output += args.map(
+            (x, i) => x.isRestParameter 
+                ? 'local ' + x.name + ' = javascript_splice(arguments, ' + (i+1) + ')'
+                : 'local ' + x.name + ' = arguments[' + (i+1).toString() + ']' + ' or ' + x.default_value + '\n')
+            .join('')
+        output += '\n\n' + this.visit(ctx.body) + '\n\nend\n\n'
+
+        return output
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Formal_Parameter_List_With_Args.
+    visitFormal_Parameter_List_With_Args(ctx) {
+        return this.visitChildren(ctx).filter(x=>x!==undefined)
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Formal_Parameter_Rest_Parameter.
+    visitFormal_Parameter_Rest_Parameter(ctx) {
+        return this.visitChildren(ctx)
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Formal_Parameter_Arg.
+    visitFormal_Parameter_Arg(ctx) {
+        return {
+            name: ctx.name.text,
+            default_value: ctx.default_value ? this.visit(ctx.default_value) : 'nil',
+            isRestParameter: false
+        }
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Last_Formal_Parameter_Arg.
+    visitLast_Formal_Parameter_Arg(ctx) {
+        return {
+            name: this.visit(ctx.name),
+            isRestParameter: true
+        }
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Function_Body.
+    visitFunction_Body(ctx) {
+        return this.visitChildren(ctx).filter(x=>x!==undefined).join('\n')
     }
 
 
@@ -82,7 +140,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Instantiate.
     visitSingle_Expression_Instantiate(ctx) {
-        return this.visit(ctx.class_name) + '.new()'
+        return this.visit(ctx.class_name) + '.new({})'
     }
 
 
@@ -177,7 +235,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         if (operation == "<<") {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') << javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
         } else if (operation == '>>') {
-            return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') // javascript_exponentiate(2, javascript_toNumeric(' + this.visit(ctx.exp2) + '))) '
+            return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ javascript_toNumeric(' + this.visit(ctx.exp2) + '))) '
         } else if (operation == '>>>') {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
         }
@@ -260,7 +318,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             case '<<=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') << javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '>>=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') // javascript_exponentiate(2, javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
+                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
             case '>>>=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '&=':
@@ -328,7 +386,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Arguments_Rule.
     visitArguments_Rule(ctx) {
-        return '(' + this.visitChildren(ctx).join(', ') + ')'
+        return '({' + this.visitChildren(ctx).filter(x=>x!==undefined).join(', ') + '})'
     }
 
 
@@ -358,13 +416,13 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Array_Literal.
     visitArray_Literal(ctx) {
-        return '{' + this.visitChildren(ctx)[0].join(", ") + '}'
+        return '{' + this.visitChildren(ctx).filter(x=>x!==undefined)[0].join(", ") + '}'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Element_List.
     visitElement_List(ctx) {
-        let arrayElements = this.visitChildren(ctx)
+        let arrayElements = this.visitChildren(ctx).filter(x=>x!==undefined)
         return arrayElements
     }
 
@@ -378,11 +436,8 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Object_Literal.
     visitObject_Literal(ctx) {
         let propertiesAsStrings = []
-        let properties = this.visitChildren(ctx)
+        let properties = this.visitChildren(ctx).filter(x=>x!==undefined)
         for (let prop of properties) {
-            if (prop == undefined) {
-                continue
-            }
             propertiesAsStrings.push(prop.name + " = " + prop.value)
         }
         return "{ " + propertiesAsStrings.join(", ") + " }"

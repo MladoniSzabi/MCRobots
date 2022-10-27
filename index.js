@@ -4,9 +4,9 @@ import JavascriptParser from './lib/JavascriptParser.js';
 import { JavascriptVisitorImplementation } from './transpiler/JavascriptVisitor.js'
 
 const input = `
-let i = 1
-i *= 2
-let j = 2
+function asd(a, b=1, ...asd) {
+    return 1
+}
 `;
 
 console.log(input)

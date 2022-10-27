@@ -9,7 +9,8 @@ statementList:
 	| expressionStatement	# Statement_List_Expression_Statement
 	| continueStatement		# Statement_List_Continue
 	| breakStatement		# Statement_List_Break
-	| returnStatement		# Statement_List_Return;
+	| returnStatement		# Statement_List_Return
+	| functionDeclaration	# Statement_List_Function_Declaration;
 
 block: '{' statementList+ '}' # Block_Statement_List;
 emptyStatement: SemiColon # Empty_Statement;
@@ -20,6 +21,19 @@ continueStatement: Continue;
 breakStatement: Break;
 returnStatement:
 	Return expression = expressionSequence # Return_Statement;
+
+functionDeclaration:
+	Function_ function_name = VariableName '(' args = formalParameterList? ')' body = functionBody #
+		Function_Declaration;
+formalParameterList:
+	formalParameterArg (',' formalParameterArg)* (
+		',' lastFormalParameterArg
+	)?							# Formal_Parameter_List_With_Args
+	| lastFormalParameterArg	# Formal_Parameter_Rest_Parameter;
+
+formalParameterArg: name=VariableName ('=' default_value=singleExpression)? #Formal_Parameter_Arg;
+lastFormalParameterArg: Ellipsis name=singleExpression #Last_Formal_Parameter_Arg;
+functionBody: '{' statementList+ '}' #Function_Body;
 
 singleExpression:
 	New class_name = singleExpression new_arguments = arguments #
@@ -134,6 +148,8 @@ eos: SemiColon;
 
 WhiteSapce: [\n ] -> skip;
 SemiColon: ';';
+Ellipsis: '...';
+Function_: 'function';
 Return: 'return';
 Break: 'break';
 Continue: 'continue';
