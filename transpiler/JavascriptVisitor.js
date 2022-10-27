@@ -64,7 +64,7 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Typeof.
     visitSingle_Expression_Typeof(ctx) {
-        return 'type(' + this.visit(ctx.expression) + ')'
+        return 'javascript_type(' + this.visit(ctx.expression) + ')'
     }
 
 
@@ -243,13 +243,13 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
     // TODO:
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Import.
     visitSingle_Expression_Import(ctx) {
-        return this.visitChildren(ctx)[0]
+        return 'javascript_import(' + this.visit(ctx.exp) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super.
     visitSingle_Expression_Super(ctx) {
-        return 'super'
+        return 'javascript_super'
     }
 
 
