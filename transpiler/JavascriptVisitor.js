@@ -1,6 +1,6 @@
-import JavascriptVisitor from "../lib/JavascriptVisitor";
+import JavascriptVisitor from "../lib/JavascriptVisitor.js";
 
-class JavascriptVisitorImplementation extends JavascriptVisitor {
+export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Program_Start.
     visitProgram_Start(ctx) {
@@ -137,11 +137,12 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Bit_Shift.
     visitSingle_Expression_Bit_Shift(ctx) {
-        if (ctx.operation.text == "<<") {
+        let operation = ctx.operation.text
+        if (operation == "<<") {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') << javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
-        } else if (ctx.operation.text == '>>') {
+        } else if (operation == '>>') {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') // javascript_exponentiate(2, javascript_toNumeric(' + this.visit(ctx.exp2) + '))) '
-        } else if (ctx.operation.text == '>>>') {
+        } else if (operation == '>>>') {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
         }
     }
@@ -203,13 +204,15 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Assignment.
     visitSingle_Expression_Assignment(ctx) {
+        console.log(1)
         return this.visit(ctx.exp1) + '=' + this.visit(ctx.exp2)
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Assignment_Operator.
     visitSingle_Expression_Assignment_Operator(ctx) {
-        switch (ctx.operator.text) {
+        console.log(ctx.operator.getText())
+        switch (ctx.operator.getText()) {
             case '*=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') * javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '/=':
@@ -235,7 +238,7 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
             case '**=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') ^ javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
         }
-        console.error('Assignment operator', ctx.operator.text, 'not understood. Defaulting to simple assignment')
+        console.error('Assignment operator', ctx.operator.getText(), 'not understood. Defaulting to simple assignment')
         return this.visit(ctx.exp1) + '=' + this.visit(ctx.exp2)
     }
 
@@ -322,7 +325,6 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Element_List.
     visitElement_List(ctx) {
         let arrayElements = this.visitChildren(ctx)
-        console.log(arrayElements)
         return arrayElements
     }
 
@@ -337,10 +339,12 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitObject_Literal(ctx) {
         let propertiesAsStrings = []
         let properties = this.visitChildren(ctx)
-        for (let prop in properties) {
+        for (let prop of properties) {
+            if(prop == undefined) {
+                continue
+            }
             propertiesAsStrings.push(prop.name + " = " + prop.value)
         }
-        console.log(properties, obj)
         return "{ " + propertiesAsStrings.join(", ") + " }"
     }
 
@@ -375,20 +379,21 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Variable_Declaration_List.
     visitVariable_Declaration_List(ctx) {
         let output = ""
-        if (ctx.var_modifier.text == "let" || ctx.var_modifier.text == "const") {
+        if (ctx.var_modifier.getText() == "let" || ctx.var_modifier.getText() == "const") {
             output = "local "
         }
 
         let first_var = this.visit(ctx.single_declaration)
 
-        let variable_names = [first_var.variable_name]
-        let variable_values = [first_var.variable_value]
-
-        if (ctx.other_declaration) {
-            for (let v in this.visit(ctx.other_declaration)) {
-                variable_names.push(v.variable_name)
-                variable_values.push(v.variable_value)
+        let variable_names = []
+        let variable_values = []
+        let declarations = this.visitChildren(ctx).splice(1)
+        for (let v of declarations) {
+            if(v == undefined) {
+                continue
             }
+            variable_names.push(v.variable_name)
+            variable_values.push(v.variable_value)
         }
 
         output += variable_names.join(", ") + " = " + variable_values.join(",")
@@ -451,7 +456,7 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
 
         let currentlyParsing = "integerPart"
 
-        for (let c in text) {
+        for (let c of text) {
             if ("0123456789".includes(c)) {
                 if (currentlyParsing == 'integerPart') {
                     integerPart = integerPart * 10 + c.charCodeAt(0) - 48 // character code of 0
@@ -472,7 +477,12 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
             }
         }
 
-        let finalValue = (integerPart + decimalPart / decimalPartLength) * (10 ** exponent)
+        let finalValue
+        if(decimalPartLength != 0) {
+            finalValue = (integerPart + decimalPart / decimalPartLength) * (10 ** exponent)
+        } else {
+            finalValue = integerPart * (10 ** exponent)
+        }
         if (isNegative) {
             finalValue = -finalValue
         }
@@ -484,7 +494,7 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitLiteral_Hex_Integer(ctx) {
         let value = 0
         let text = ctx.getText().substring(2)
-        for (let c in text) {
+        for (let c of text) {
             if ("0123456789".includes(c)) {
                 value = value * 16 + c.charCodeAt(0) - 48 // character code of 0
                 continue
@@ -528,7 +538,7 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
         }
 
         let value = 0
-        for (c in text) {
+        for (c of text) {
             if (c == "_") {
                 continue
             }
@@ -550,7 +560,7 @@ class JavascriptVisitorImplementation extends JavascriptVisitor {
         let value = 0
         let text = ctx.getText().substring(2)
 
-        for (c in text) {
+        for (c of text) {
             switch (c) {
                 case '0':
                     value = value * 2
