@@ -1,4 +1,4 @@
-import JavascriptVisitor from "../lib/JavascriptVisitor.js"
+import JavascriptVisitor from '../lib/JavascriptVisitor.js'
 
 export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
@@ -205,7 +205,6 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     }
 
 
-    //TODO:
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Instantiate_With_Args.
     visitSingle_Expression_Instantiate_With_Args(ctx) {
         return this.visit(ctx.class_name) + '.new ' + this.visit(new_arguments)
@@ -306,7 +305,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Bit_Shift.
     visitSingle_Expression_Bit_Shift(ctx) {
         let operation = ctx.operation.text
-        if (operation == "<<") {
+        if (operation == '<<') {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') << javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
         } else if (operation == '>>') {
             return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ javascript_toNumeric(' + this.visit(ctx.exp2) + '))) '
@@ -490,7 +489,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Array_Literal.
     visitArray_Literal(ctx) {
-        return '{' + this.visitChildren(ctx).filter(x => x !== undefined)[0].join(", ") + '}'
+        return '{' + this.visitChildren(ctx).filter(x => x !== undefined)[0].join(', ') + '}'
     }
 
 
@@ -512,9 +511,9 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let propertiesAsStrings = []
         let properties = this.visitChildren(ctx).filter(x => x !== undefined)
         for (let prop of properties) {
-            propertiesAsStrings.push(prop.name + " = " + prop.value)
+            propertiesAsStrings.push(prop.name + ' = ' + prop.value)
         }
-        return "{ " + propertiesAsStrings.join(", ") + " }"
+        return '{ ' + propertiesAsStrings.join(', ') + ' }'
     }
 
 
@@ -595,7 +594,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Literal_Null.
     visitLiteral_Null(ctx) {
-        return "nil"
+        return 'nil'
     }
 
 
@@ -626,10 +625,10 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let decimalPartLength = 0
         let isNegative = false
 
-        let currentlyParsing = "integerPart"
+        let currentlyParsing = 'integerPart'
 
         for (let c of text) {
-            if ("0123456789".includes(c)) {
+            if ('0123456789'.includes(c)) {
                 if (currentlyParsing == 'integerPart') {
                     integerPart = integerPart * 10 + c.charCodeAt(0) - 48 // character code of 0
                 } else if (currentlyParsing == 'decimalPart') {
@@ -667,7 +666,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let value = 0
         let text = ctx.getText().substring(2)
         for (let c of text) {
-            if ("0123456789".includes(c)) {
+            if ('0123456789'.includes(c)) {
                 value = value * 16 + c.charCodeAt(0) - 48 // character code of 0
                 continue
             }
@@ -693,7 +692,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
                 case '_':
                     break
                 default:
-                    console.error("Hexadecimal digit", c, "not understood. Ignoring.")
+                    console.error('Hexadecimal digit', c, 'not understood. Ignoring.')
             }
         }
         return value.toString()
@@ -703,7 +702,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Literal_Octal_Integer.
     visitLiteral_Octal_Integer(ctx) {
         let text = ctx.getText()
-        if (text[1] == "o" || text[1] == "O") {
+        if (text[1] == 'o' || text[1] == 'O') {
             text = text.substring(2)
         } else {
             text = text.substring(1)
@@ -711,7 +710,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
         let value = 0
         for (c of text) {
-            if (c == "_") {
+            if (c == '_') {
                 continue
             }
             value = value * 8 + c.charCodeAt() - 48 // character code of 0
@@ -743,7 +742,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
                 case '_':
                     continue
                 default:
-                    console.error("Binary digit", c, "not understood. Ignoring")
+                    console.error('Binary digit', c, 'not understood. Ignoring')
             }
         }
 
@@ -753,7 +752,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#eos.
     visitEos(ctx) {
-        return ""
+        return ''
     }
 
 }

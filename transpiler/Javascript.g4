@@ -20,18 +20,22 @@ emptyStatement: SemiColon # Empty_Statement;
 expressionStatement: expressionSequence # Expression_Statement;
 
 ifStatement:
-	If '(' condition=expressionSequence ')' body=statementList (
-		Else else_body=statementList
+	If '(' condition = expressionSequence ')' body = statementList (
+		Else else_body = statementList
 	)? # If_Statement;
 iterationStatement:
-	Do body=statementList While '(' condition=expressionSequence ')'	# Iteration_Statement_Do_While
-	| While '(' condition=expressionSequence ')' body=statementList	# Iteration_Statement_While
-	| For '(' (initialisation_expression=expressionSequence | initialisation_var=variableDeclarationList)? ';' condition=expressionSequence? ';'
-		increment=expressionSequence? ')' body=statementList														# Iteration_Statement_For
-	| For '(' initialisation_var=variableDeclarationList In dictionary=expressionSequence ')' body=statementList	#
-		Iteration_Statement_For_In
-	| For '(' initialisation_var=variableDeclarationList Of array=expressionSequence ')' body=statementList #
-		Iteration_Statement_For_Of;
+	Do body = statementList While '(' condition = expressionSequence ')' #
+		Iteration_Statement_Do_While
+	| While '(' condition = expressionSequence ')' body = statementList # Iteration_Statement_While
+	| For '(' (
+		initialisation_expression = expressionSequence
+		| initialisation_var = variableDeclarationList
+	)? ';' condition = expressionSequence? ';' increment = expressionSequence? ')' body =
+		statementList # Iteration_Statement_For
+	| For '(' initialisation_var = variableDeclarationList In dictionary = expressionSequence ')'
+		body = statementList # Iteration_Statement_For_In
+	| For '(' initialisation_var = variableDeclarationList Of array = expressionSequence ')' body =
+		statementList # Iteration_Statement_For_Of;
 
 continueStatement: Continue;
 breakStatement: Break;
