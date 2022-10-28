@@ -12,6 +12,7 @@ if [ "$1" = "debug" ]; then
     CLASSPATH=$(pwd)/transpiler/antlr-4.10.1-complete.jar:.
     cd grun
     javac -classpath "$CLASSPATH" Javascript*.java
+    echo "Enter text:"
     java -cp "$CLASSPATH" org.antlr.v4.gui.TestRig Javascript program -gui
     cd ..
     rm -r grun
