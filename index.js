@@ -4,12 +4,19 @@ import JavascriptParser from './lib/JavascriptParser.js';
 import { JavascriptVisitorImplementation } from './transpiler/JavascriptVisitor.js'
 
 const input = `
-function asd(a, b=1, ...asd) {
-    return 1
+for(let i = 0; i < 5; i++) {
+    print(i)
 }
+
+while(true) {
+    break
+}
+
+do {
+    print(1)
+} while(false)
 `;
 
-console.log(input)
 const chars = new antlr4.InputStream(input);
 const lexer = new JavascriptLexer(chars);
 

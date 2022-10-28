@@ -7,6 +7,8 @@ statementList:
 	| variableStatement		# Statement_List_Variable_Statement
 	| emptyStatement		# Statement_List_Empty_Statement
 	| expressionStatement	# Statement_List_Expression_Statement
+	| ifStatement			# Statement_List_If_Statement
+	| iterationStatement	# Statement_List_Iteration_Statement
 	| continueStatement		# Statement_List_Continue
 	| breakStatement		# Statement_List_Break
 	| returnStatement		# Statement_List_Return
@@ -16,6 +18,20 @@ block: '{' statementList+ '}' # Block_Statement_List;
 emptyStatement: SemiColon # Empty_Statement;
 
 expressionStatement: expressionSequence # Expression_Statement;
+
+ifStatement:
+	If '(' condition=expressionSequence ')' body=statementList (
+		Else else_body=statementList
+	)? # If_Statement;
+iterationStatement:
+	Do body=statementList While '(' condition=expressionSequence ')'	# Iteration_Statement_Do_While
+	| While '(' condition=expressionSequence ')' body=statementList	# Iteration_Statement_While
+	| For '(' (initialisation_expression=expressionSequence | initialisation_var=variableDeclarationList)? ';' condition=expressionSequence? ';'
+		increment=expressionSequence? ')' body=statementList														# Iteration_Statement_For
+	| For '(' initialisation_var=variableDeclarationList In dictionary=expressionSequence ')' body=statementList	#
+		Iteration_Statement_For_In
+	| For '(' initialisation_var=variableDeclarationList Of array=expressionSequence ')' body=statementList #
+		Iteration_Statement_For_Of;
 
 continueStatement: Continue;
 breakStatement: Break;
@@ -31,9 +47,11 @@ formalParameterList:
 	)?							# Formal_Parameter_List_With_Args
 	| lastFormalParameterArg	# Formal_Parameter_Rest_Parameter;
 
-formalParameterArg: name=VariableName ('=' default_value=singleExpression)? #Formal_Parameter_Arg;
-lastFormalParameterArg: Ellipsis name=singleExpression #Last_Formal_Parameter_Arg;
-functionBody: '{' statementList+ '}' #Function_Body;
+formalParameterArg:
+	name = VariableName ('=' default_value = singleExpression)? # Formal_Parameter_Arg;
+lastFormalParameterArg:
+	Ellipsis name = singleExpression # Last_Formal_Parameter_Arg;
+functionBody: '{' statementList+ '}' # Function_Body;
 
 singleExpression:
 	New class_name = singleExpression new_arguments = arguments #
@@ -149,6 +167,12 @@ eos: SemiColon;
 WhiteSapce: [\n ] -> skip;
 SemiColon: ';';
 Ellipsis: '...';
+Of: 'of';
+For: 'for';
+Do: 'do';
+While: 'while';
+Else: 'else';
+If: 'if';
 Function_: 'function';
 Return: 'return';
 Break: 'break';
