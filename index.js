@@ -4,17 +4,34 @@ import JavascriptParser from './lib/JavascriptParser.js';
 import { JavascriptVisitorImplementation } from './transpiler/JavascriptVisitor.js'
 
 const input = `
-for(let i = 0; i < 5; i++) {
-    print(i)
+
+class Test {
+    sayHi() {
+        print("ASd")
+    }
+
+    sayBoo() {
+        print("Boo")
+    }
+}
+class TestClass{
+    sayHi() {
+        this.asd += 1
+        print(this.asd)
+    }
+
+    asd = 1;
 }
 
-while(true) {
-    break
-}
+let t = new Test()
+t.sayHi()
+t.sayBoo()
+print(t.asd)
 
-do {
-    print(1)
-} while(false)
+let t2 = new TestClass()
+t2.sayHi()
+t2.sayBoo()
+print(t2.asd)
 `;
 
 const chars = new antlr4.InputStream(input);

@@ -2,6 +2,8 @@ import JavascriptVisitor from '../lib/JavascriptVisitor.js'
 
 export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
+    className = ''
+
     // Visit a parse tree produced by JavascriptParser#Program_Start.
     visitProgram_Start(ctx) {
         return this.visitChildren(ctx).join('\n')
@@ -114,6 +116,91 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     }
 
 
+    // Visit a parse tree produced by JavascriptParser#Class_Declaration.
+    visitClass_Declaration(ctx) {
+        return 'local ' + ctx.class_name.text + ' = {}\n' + 
+            'function ' + ctx.class_name.text + ':new(arguments)\n' +
+            'local inst = {}\n' +
+            this.visit(ctx.class_tail) +
+            'return inst\n' +
+            'end\n'
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Class_Tail.
+    visitClass_Tail(ctx) {
+        let output = ''
+        if(ctx.parent_class) {
+            // TODO: implement inheritance
+            // output += 'setmetatable(inst, ' +
+            // '{ __index = function(t, key)\n' +
+            // 'if(t[key] ~= nil) then\n' +
+            // 'return t.key\n' +
+            // 'end\n' +
+            // 'if(' + this.visit(ctx.parent_class) + '[key] ~= nil) then\n'+
+            // 'return ' + this.visit(ctx.parent_class) + '[key]\n' +
+            // 'end\n' +
+            // 'return nil\n' + 
+            // 'end\n' +
+            // '})\n'
+        }
+
+        output += this.visit(ctx.class_content)
+
+
+        
+
+        return output
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Class_Element_List.
+    visitClass_Element_List(ctx) {
+        return this.visitChildren(ctx).join('\n\n')
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Class_Element_Method_Definition.
+    visitClass_Element_Method_Definition(ctx) {
+        let method = this.visit(ctx.method)
+        return 'inst.' + method.name + ' = function(__javascript_arguments)\n' + 
+            'this = inst\n' + 
+            'local __javascript_class_method_function = function(__javascript_arguments)' +
+            method.arguments.map(
+                (x, i) => x.isRestParameter
+                    ? 'local ' + x.name + ' = javascript_splice(__javascript_arguments, ' + (i + 1) + ')'
+                    : 'local ' + x.name + ' = __javascript_arguments[' + (i + 1).toString() + ']' + ' or ' + x.default_value + '\n')
+                .join('') + '\n' +
+            method.body +
+            '\nend\n' +
+            '__javascript_class_method_function(__javascript_arguments)\n' +
+            'end\n' +
+            (method.name === 'constructor' ? 'inst.constructor(arguments)\n' : '')
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Class_Element_Empty_Statement.
+    visitClass_Element_Empty_Statement(ctx) {
+        return ''
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Class_Element_Property_Definition.
+    visitClass_Element_Property_Definition(ctx) {
+        return 'inst.' + this.visit(ctx.property_name) + ' = ' + this.visit(ctx.property_value)
+    }
+
+
+    // Visit a parse tree produced by JavascriptParser#Class_Element_Property_Definition.
+    visitMethod_Definition(ctx) {
+        return {
+            name: this.visit(ctx.method_name),
+            arguments: ctx.method_args ? this.visit(ctx.method_args) : [],
+            body: this.visit(ctx.method_body)
+        }
+    }
+
+
     // Visit a parse tree produced by JavascriptParser#Statement_List_Expression_Statement.
     visitStatement_List_Expression_Statement(ctx) {
         return this.visitChildren(ctx).join('\n')
@@ -205,9 +292,17 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     }
 
 
+    // Visit a parse tree produced by JavascriptParser#Single_Expression_Member_Dot_Expression.
+    visitSingle_Expression_Member_Dot_Expression(ctx) {
+        return this.visit(ctx.member) +
+        '.' +
+        ctx.member_content.text
+    }
+
+
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Instantiate_With_Args.
     visitSingle_Expression_Instantiate_With_Args(ctx) {
-        return this.visit(ctx.class_name) + '.new ' + this.visit(new_arguments)
+        return this.visit(ctx.class_name) + '.new' + this.visit(ctx.new_arguments)
     }
 
 

@@ -6,6 +6,7 @@ statementList:
 	block					# Statement_List_Block
 	| variableStatement		# Statement_List_Variable_Statement
 	| emptyStatement		# Statement_List_Empty_Statement
+	| classDeclaration		# Statement_List_Class_Declaration
 	| expressionStatement	# Statement_List_Expression_Statement
 	| ifStatement			# Statement_List_If_Statement
 	| iterationStatement	# Statement_List_Iteration_Statement
@@ -57,8 +58,24 @@ lastFormalParameterArg:
 	Ellipsis name = singleExpression # Last_Formal_Parameter_Arg;
 functionBody: '{' statementList+ '}' # Function_Body;
 
+classDeclaration:
+	Class class_name = VariableName class_tail = classTail										# Class_Declaration;
+classTail: (Extends parent_class = singleExpression)? '{' class_content = classElementList '}'	#
+		Class_Tail;
+classElementList: classElement* # Class_Element_List;
+classElement:
+	isStatic = Static? method = methodDefinition							# Class_Element_Method_Definition
+	| emptyStatement														# Class_Element_Empty_Statement
+	| property_name = propertyName '=' property_value = singleExpression	#
+		Class_Element_Property_Definition;
+
+methodDefinition:
+	method_name = propertyName '(' method_args = formalParameterList? ')' method_body = functionBody 
+		# Method_Definition;
+
 singleExpression:
-	New class_name = singleExpression new_arguments = arguments #
+	member=singleExpression '.' member_content=VariableName								# Single_Expression_Member_Dot_Expression
+	| New class_name = singleExpression new_arguments = arguments	#
 		Single_Expression_Instantiate_With_Args
 	| New class_name = singleExpression # Single_Expression_Instantiate
 	// | anonymousFunction
@@ -171,6 +188,9 @@ eos: SemiColon;
 WhiteSapce: [\n ] -> skip;
 SemiColon: ';';
 Ellipsis: '...';
+Static: 'static';
+Class: 'class';
+Extends: 'extends';
 Of: 'of';
 For: 'for';
 Do: 'do';
