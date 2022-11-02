@@ -59,9 +59,9 @@ lastFormalParameterArg:
 functionBody: '{' statementList+ '}' # Function_Body;
 
 classDeclaration:
-	Class class_name = VariableName class_tail = classTail										# Class_Declaration;
-classTail: (Extends parent_class = singleExpression)? '{' class_content = classElementList '}'	#
-		Class_Tail;
+	Class class_name = VariableName (
+		Extends parent_class = singleExpression
+	)? '{' class_content = classElementList '}' # Class_Declaration;
 classElementList: classElement* # Class_Element_List;
 classElement:
 	isStatic = Static? method = methodDefinition							# Class_Element_Method_Definition
@@ -74,8 +74,9 @@ methodDefinition:
 		# Method_Definition;
 
 singleExpression:
-	member=singleExpression '.' member_content=VariableName								# Single_Expression_Member_Dot_Expression
-	| New class_name = singleExpression new_arguments = arguments	#
+	member = singleExpression '.' member_content = VariableName #
+		Single_Expression_Member_Dot_Expression
+	| New class_name = singleExpression new_arguments = arguments #
 		Single_Expression_Instantiate_With_Args
 	| New class_name = singleExpression # Single_Expression_Instantiate
 	// | anonymousFunction
@@ -116,6 +117,7 @@ singleExpression:
 	| <assoc = right> exp1 = singleExpression operator = assignmentOperator exp2 = singleExpression	#
 		Single_Expression_Assignment_Operator
 	| Import '(' exp = singleExpression ')'	# Single_Expression_Import
+	| Super constructor_args = arguments	# Single_Expression_Super_Constructor
 	| Super									# Single_Expression_Super
 	| VariableName							# Single_Expression_Variable
 	| literal								# Single_Expression_Literal

@@ -7,17 +7,19 @@ const input = `
 
 class Test {
     sayHi() {
-        print("ASd")
+        console.log("ASd")
     }
 
     sayBoo() {
-        print("Boo")
+        console.log("Boo")
     }
+
+    dsa = 2
 }
-class TestClass{
+class TestClass extends Test{
     sayHi() {
         this.asd += 1
-        print(this.asd)
+        console.log(this.asd)
     }
 
     asd = 1;
@@ -26,12 +28,14 @@ class TestClass{
 let t = new Test()
 t.sayHi()
 t.sayBoo()
-print(t.asd)
+console.log(t.asd)
+console.log(t.dsa)
 
 let t2 = new TestClass()
 t2.sayHi()
 t2.sayBoo()
-print(t2.asd)
+console.log(t2.asd)
+console.log(t2.dsa)
 `;
 
 const chars = new antlr4.InputStream(input);
