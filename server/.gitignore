@@ -1,0 +1,5 @@
+.import/
+assets/minecraft/
+assets/blender/*.material
+assets/blender/*.glb
+*.import
