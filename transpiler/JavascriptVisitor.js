@@ -182,6 +182,9 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         'inst.constructor(arguments)\n' +
         'end\n' +
         'setmetatable(inst, { __index = function(t, key)\n' +
+        'if(key=="__javascript_class") then\n' +
+        'return ' + ctx.class_name.text + '\n' +
+        'end\n' +
         'if(__javascript_class_properties[key]) then\n' + 
         'return __javascript_class_properties[key]\n' +
         'elseif(' + ctx.class_name.text + '.__javascript_parent_class) then\n'+

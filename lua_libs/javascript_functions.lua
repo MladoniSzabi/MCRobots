@@ -15,11 +15,19 @@ function javascript.javascript_toBoolean(val)
 end
 
 function javascript.javascript_instanceof(val, class)
+    inst_class = val.__javascript_class
+    while (inst_class ~= nil)
+    do
+        if inst_class == class then
+            return true
+        end
+        inst_class = inst_class.__javascript_parent_class
+    end
     return false
 end
 
 function javascript.javascript_hasProperty(val, prop)
-    return false
+    return val[prop] ~= nil
 end
 
 function javascript.javascript_logicalOr(expr1, expr2)
@@ -27,9 +35,7 @@ function javascript.javascript_logicalOr(expr1, expr2)
 end
 
 function javascript.javascript_import(file)
-end
-
-function javascript.javascript_super(instance)
+    return require(file)
 end
 
 javascript.console = {}
