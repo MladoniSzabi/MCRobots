@@ -7,8 +7,8 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Program_Start.
     visitProgram_Start(ctx) {
         return 'local js = require "lua_libs/javascript_functions"\n' +
-        'js.add_to_table(js)\n' +
-        this.visitChildren(ctx).join('\n')
+            'js.add_to_table(js)\n' +
+            this.visitChildren(ctx).join('\n')
     }
 
 
@@ -123,80 +123,80 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         this.classStack.push(ctx.class_name.text)
 
         let inheritProperties = ''
-        if(ctx.parent_class) {
+        if (ctx.parent_class) {
             inheritProperties += this.visit(ctx.parent_class) + '.__javascript_add_default_properties(inst)'
         }
 
         let classContent = this.visit(ctx.class_content)
         let propertyImplementations = ''
         let inClassProperties = ''
-        for(let property of classContent) {
-            if(property.type == 'property') {
-                propertyImplementations += ctx.class_name.text + '.__javascript_default_properties.' + property.name + ' = '+ property.value +'\n'
-                inClassProperties += '__javascript_class_properties.' + property.name + ' = '+ property.value +'\n'
-            } else if(property.type == 'method') {
+        for (let property of classContent) {
+            if (property.type == 'property') {
+                propertyImplementations += ctx.class_name.text + '.__javascript_default_properties.' + property.name + ' = ' + property.value + '\n'
+                inClassProperties += '__javascript_class_properties.' + property.name + ' = ' + property.value + '\n'
+            } else if (property.type == 'method') {
                 propertyImplementations += ctx.class_name.text + '.__internal_methods.' + property.name + ' = function(this, __javascript_arguments)\n' +
-                property.arguments.map(
-                    (x, i) => x.isRestParameter
-                        ? ('local ' + x.name + ' = javascript_splice(__javascript_arguments, ' + (i + 1) + ')')
-                        : ('local ' + x.name + ' = __javascript_arguments[' + (i + 1).toString() + ']' + ' or ' + x.default_value + '\n'))
-                    .join('') + '\n' +
-                property.body +
-                '\nend\n'
+                    property.arguments.map(
+                        (x, i) => x.isRestParameter
+                            ? ('local ' + x.name + ' = javascript_splice(__javascript_arguments, ' + (i + 1) + ')')
+                            : ('local ' + x.name + ' = __javascript_arguments[' + (i + 1).toString() + ']' + ' or ' + x.default_value + '\n'))
+                        .join('') + '\n' +
+                    property.body +
+                    '\nend\n'
 
-                inClassProperties += '__javascript_class_properties.' + property.name + ' = function(__javascript_arguments)\n' + 
-                'return ' + this.classStack[this.classStack.length-1] + '.__internal_methods.' + property.name + '(inst, __javascript_arguments)\n'+
-                'end\n'
+                inClassProperties += '__javascript_class_properties.' + property.name + ' = function(__javascript_arguments)\n' +
+                    'return ' + this.classStack[this.classStack.length - 1] + '.__internal_methods.' + property.name + '(inst, __javascript_arguments)\n' +
+                    'end\n'
             }
         }
 
-        let output = 'local ' + ctx.class_name.text + ' = {}\n' + 
-        ctx.class_name.text + '.__internal_methods = {}\n' +
-        ctx.class_name.text + '.__javascript_default_properties = {}\n' +
-        ctx.class_name.text + '.__javascript_parent_class = ' + (ctx.parent_class ? this.visit(ctx.parent_class) : 'nil') + '\n' +
-        'function ' + ctx.class_name.text + '.__javascript_get_internal_method(key)\n' +
-        'if (' + ctx.class_name.text + '.__internal_methods[key]) then\n' +
-        'return ' + ctx.class_name.text + '.__internal_methods[key]\n' +
-        'elseif (' + ctx.class_name.text + '.__javascript_parent_class) then \n' +
-        'return ' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key) \n' +
-        'else\n' +
-        'return nil\n' +
-        'end\n' +
-        'end\n\n' +
-        'function ' + ctx.class_name.text + '.__javascript_add_default_properties(inst)\n' +
-        'if(' + ctx.class_name.text + '.__javascript_parent_class) then\n' + 
-        ctx.class_name.text + '.__javascript_parent_class.__javascript_add_default_properties(inst)\n' +
-        'end\n' +
-        'end\n\n' +
-        propertyImplementations + 
-        'function ' + ctx.class_name.text + '.new(arguments)\n' +
-        'local inst = {}\n' +
-        'local __javascript_class_properties = {}\n'+
-        'local __javascript_parent = {}\n' + 
-        'setmetatable(__javascript_parent, { __index = function(t,key)\n' +
-        'return ' + (ctx.parent_class ? ('function(arguments) ' + this.visit(ctx.parent_class) + '.__javascript_get_internal_method(key)(inst, arguments) end') : 'nil') + '\n' +
-        'end\n' +
-        '})\n' +
-        inClassProperties +
-        'if(inst.constructor) then \n' +
-        'inst.constructor(arguments)\n' +
-        'end\n' +
-        'setmetatable(inst, { __index = function(t, key)\n' +
-        'if(key=="__javascript_class") then\n' +
-        'return ' + ctx.class_name.text + '\n' +
-        'end\n' +
-        'if(__javascript_class_properties[key]) then\n' + 
-        'return __javascript_class_properties[key]\n' +
-        'elseif(' + ctx.class_name.text + '.__javascript_parent_class) then\n'+
-        'return ' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key)\n' +
-        'else\n' +
-        'return nil\n' +
-        'end\n' +
-        'end\n' +
-        '})\n' +
-        inheritProperties +
-        'return inst\n' +
-        'end\n'
+        let output = 'local ' + ctx.class_name.text + ' = {}\n' +
+            ctx.class_name.text + '.__internal_methods = {}\n' +
+            ctx.class_name.text + '.__javascript_default_properties = {}\n' +
+            ctx.class_name.text + '.__javascript_parent_class = ' + (ctx.parent_class ? this.visit(ctx.parent_class) : 'nil') + '\n' +
+            'function ' + ctx.class_name.text + '.__javascript_get_internal_method(key)\n' +
+            'if (' + ctx.class_name.text + '.__internal_methods[key]) then\n' +
+            'return ' + ctx.class_name.text + '.__internal_methods[key]\n' +
+            'elseif (' + ctx.class_name.text + '.__javascript_parent_class) then \n' +
+            'return ' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key) \n' +
+            'else\n' +
+            'return nil\n' +
+            'end\n' +
+            'end\n\n' +
+            'function ' + ctx.class_name.text + '.__javascript_add_default_properties(inst)\n' +
+            'if(' + ctx.class_name.text + '.__javascript_parent_class) then\n' +
+            ctx.class_name.text + '.__javascript_parent_class.__javascript_add_default_properties(inst)\n' +
+            'end\n' +
+            'end\n\n' +
+            propertyImplementations +
+            'function ' + ctx.class_name.text + '.new(arguments)\n' +
+            'local inst = {}\n' +
+            'local __javascript_class_properties = {}\n' +
+            'local __javascript_parent = {}\n' +
+            'setmetatable(__javascript_parent, { __index = function(t,key)\n' +
+            'return ' + (ctx.parent_class ? ('function(arguments) ' + this.visit(ctx.parent_class) + '.__javascript_get_internal_method(key)(inst, arguments) end') : 'nil') + '\n' +
+            'end\n' +
+            '})\n' +
+            inClassProperties +
+            'if(inst.constructor) then \n' +
+            'inst.constructor(arguments)\n' +
+            'end\n' +
+            'setmetatable(inst, { __index = function(t, key)\n' +
+            'if(key=="__javascript_class") then\n' +
+            'return ' + ctx.class_name.text + '\n' +
+            'end\n' +
+            'if(__javascript_class_properties[key]) then\n' +
+            'return __javascript_class_properties[key]\n' +
+            'elseif(' + ctx.class_name.text + '.__javascript_parent_class) then\n' +
+            'return ' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key)\n' +
+            'else\n' +
+            'return nil\n' +
+            'end\n' +
+            'end\n' +
+            '})\n' +
+            inheritProperties +
+            'return inst\n' +
+            'end\n'
 
         this.classStack.pop()
         return output
@@ -217,7 +217,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Class_Element_Empty_Statement.
     visitClass_Element_Empty_Statement(ctx) {
-        return {type: 'empty'}
+        return { type: 'empty' }
     }
 
 
@@ -336,8 +336,8 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Member_Dot_Expression.
     visitSingle_Expression_Member_Dot_Expression(ctx) {
         return this.visit(ctx.member) +
-        '.' +
-        ctx.member_content.text
+            '.' +
+            ctx.member_content.text
     }
 
 
@@ -552,7 +552,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super_Constructor.
     visitSingle_Expression_Super_Constructor(ctx) {
-        return '__javascript_parent_class.constructor( this, ' + this.visit(ctx.super_arguments) +')'
+        return '__javascript_parent_class.constructor( this, ' + this.visit(ctx.super_arguments) + ')'
     }
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super.

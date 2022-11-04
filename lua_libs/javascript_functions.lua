@@ -16,8 +16,7 @@ end
 
 function javascript.javascript_instanceof(val, class)
     inst_class = val.__javascript_class
-    while (inst_class ~= nil)
-    do
+    while (inst_class ~= nil) do
         if inst_class == class then
             return true
         end
@@ -41,9 +40,9 @@ end
 javascript.console = {}
 
 function javascript.console.log(arguments)
-    for i = 1,#arguments do
+    for i = 1, #arguments do
         print(arguments[i])
-    end 
+    end
 end
 
 return javascript
