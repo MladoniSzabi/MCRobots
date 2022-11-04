@@ -374,25 +374,25 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // TODO: These 4 rules need a bit of work
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Post_Increment.
     visitSingle_Expression_Post_Increment(ctx) {
-        return this.visit(ctx.expression) + ' = ' + this.visit(ctx.expression) + '+1'
+        return 'javascript_post_increment(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Post_Decrement.
     visitSingle_Expression_Post_Decrement(ctx) {
-        return this.visit(ctx.expression) + ' = ' + this.visit(ctx.expression) + '-1'
+        return 'javascript_post_decrement(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Pre_Increment.
     visitSingle_Expression_Pre_Increment(ctx) {
-        return this.visit(ctx.expression) + ' = ' + this.visit(ctx.expression) + '+1'
+        return 'javascript_pre_increment(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Pre_Decrement.
     visitSingle_Expression_Pre_Decrement(ctx) {
-        return this.visit(ctx.expression) + ' = ' + this.visit(ctx.expression) + '-1'
+        return 'javascript_pre_decrement(' + this.visit(ctx.expression) + ')'
     }
 
 
@@ -434,6 +434,9 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Additive.
     visitSingle_Expression_Additive(ctx) {
+        if (ctx.operation.text == '+') {
+            return 'javascript_add(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')' // Treating addition differently as it has extra steps
+        }
         return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') ' + ctx.operation.text + ' javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
     }
 
@@ -521,7 +524,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             case '%=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') % javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '+=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') + javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = javascript_add(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')' // Treating addition differently as it has extra steps
             case '-=':
                 return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') - javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '<<=':

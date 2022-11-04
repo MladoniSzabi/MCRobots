@@ -1,5 +1,34 @@
 javascript = {}
 
+function javascript.javascript_post_increment(expr)
+    oldvalue = expr
+    expr = expr+1
+    return oldvalue
+end
+
+function javascript.javascript_pre_increment(expr)
+    expr = expr+1
+    return expr
+end
+
+function javascript.javascript_post_decrement(expr)
+    oldvalue = expr
+    expr = expr-1
+    return oldvalue
+end
+
+function javascript.javascript_pre_decrement(expr)
+    expr = expr-1
+    return expr
+end
+
+function javascript.javascript_add(expr1, expr2)
+    if(javascript_instanceof(expr1) == 'string' and javascript_instanceof(expr2) == 'string') then
+        return expr1 .. expr2
+    end
+    return toNumeric(expr1) + javascript_toNumeric(expr2)
+end
+
 function javascript.add_to_table(t)
     for key, val in pairs(t) do
         _G[key] = val
