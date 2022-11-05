@@ -1,0 +1,137 @@
+local Number = {}
+
+local __lua_environment = _G
+
+function Number.__convert_to_number(value)
+    if __lua_environment.type(value) == 'nil' then
+        return 0
+    elseif __lua_environment.type(value) == 'number' then
+        return value
+    elseif __lua_environment.type(value) == 'boolean' then
+        if value then
+            return 1
+        else
+            return 0
+        end
+    elseif __lua_environment.type(value) == 'string' then
+        return (__lua_environment.tonumber(value) or 0)
+    elseif __lua_environment.type(value) == 'table' then
+        if value.__type == nil then
+            return 0
+        elseif value.__type == 'null' then
+            value = 0
+        elseif value.__type == 'boolean' then
+            if value.__value == true then
+                value = 1
+            else
+                value = 0
+            end
+        elseif value.__type == 'number' then
+            return value.__value
+        elseif value.__type == 'string' then
+            return (__lua_environment.tonumber(value.__value) or 0)
+        elseif value.__type == 'object' then
+            if value.valueOf then
+                return value.valueOf()
+            elseif value.toString() then
+                return (__lua_environment.tonumber(value.toString()) or 0)
+            else
+                return 0
+            end
+        end
+    else
+        return 0
+    end
+end
+
+function Number.constructor(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.hasOwnProperty(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.isPrototypeOf(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.propertyIsEnumerable(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.toExponential(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.toFixed(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.toLocaleString(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.toPrecision(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.toString(this, arguments)
+    return __javascript_not_implemented()
+end
+function Number.valueOf(this, arguments)
+    return __javascript_not_implemented()
+end
+
+function Number.__init(value)
+    local inst = {}
+    inst.__value = Number.__convert_to_number(value)
+    __lua_environment.setmetatable(inst, {
+        __index = function(t, key)
+            if key == '__value' then
+                return __lua_environment.rawget(inst, '__value')
+            elseif key == '__type' then
+                return 'number'
+            elseif Number[key] then
+                return function(arguments)
+                    Number[key](inst, arguments)
+                end
+            end
+        end,
+
+        _add = function(op1, op2)
+            return Number(Number(op1).__value + Number(op2).__value)
+        end,
+
+        _sub = function(op1, op2)
+            return Number(Number(op1).__value - Number(op2).__value)
+        end,
+
+        __mul = function(op1, op2)
+            return Number(Number(op1).__value * Number(op2).__value)
+        end,
+
+        __div = function(op1, op2)
+            return Number(Number(op1).__value / Number(op2).__value)
+        end,
+
+        __mod = function(op1, op2)
+            return Number(Number(op1).__value % Number(op2).__value)
+        end,
+
+        __unm = function(op1)
+            return Number(-(Number(op1).__value))
+        end,
+
+        __eq = function(op1, op2)
+            return Number(Number(op1).__value == Number(op2).__value)
+        end,
+
+        __lt = function(op1, op2)
+            return Boolean(Number(op1).__value < Number(op2).__value)
+        end,
+
+        __le = function(op1, op2)
+            return Boolean(Number(op1).__value <= Number(op2).__value)
+        end
+    })
+    return isnt
+end
+
+__lua_environment.setmetatable(Number, {
+    __call = Number.__init
+})
+
+return {Number}
