@@ -182,6 +182,9 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             'inst.constructor(arguments)\n' +
             'end\n' +
             'setmetatable(inst, { __index = function(t, key)\n' +
+            'if(key=="__type") then\n' +
+            'return "object"\n' +
+            'end\n' +
             'if(key=="__javascript_class") then\n' +
             'return ' + ctx.class_name.text + '\n' +
             'end\n' +
@@ -274,7 +277,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#If_Statement.
     visitIf_Statement(ctx) {
-        return 'if ( ' + this.visit(ctx.condition) + ') \n' +
+        return 'if ( javascript_toBoolean(' + this.visit(ctx.condition) + ').__value ) \n' +
             'then\n' +
             this.visit(ctx.body) +
             '\nend\n\n'
@@ -285,14 +288,14 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitIteration_Statement_Do_While(ctx) {
         return 'repeat\n' +
             this.visit(ctx.body) +
-            '\nuntil(not ' + this.visit(ctx.condition) + ')\n\n'
+            '\nuntil(not javascript_toBoolean(' + this.visit(ctx.condition) + ').__value)\n\n'
     }
 
 
 
     // Visit a parse tree produced by JavascriptParser#Iteration_Statement_While.
     visitIteration_Statement_While(ctx) {
-        return 'while ( ' + this.visit(ctx.condition) + ' )\n' +
+        return 'while ( javascript_toBoolean(' + this.visit(ctx.condition) + ').__value )\n' +
             'do\n' +
             this.visit(ctx.body) +
             '\nend\n\n'
@@ -304,7 +307,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         return 'repeat\n' + // Wrap in a repeat block so we don't leak variables to outside scope
             (ctx.initialisation_expression ? this.visit(ctx.initialisation_expression) + '\n' : '') +
             (ctx.initialisation_var ? this.visit(ctx.initialisation_var) + '\n' : '') +
-            'while ( ' + this.visit(ctx.condition) + ' )\n' +
+            'while ( javascript_toBoolean(' + this.visit(ctx.condition) + ') )\n' +
             'do\n' +
             this.visit(ctx.body) + '\n' +
             this.visit(ctx.increment) +
@@ -326,7 +329,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Iteration_Statement_For_Of.
     visitIteration_Statement_For_Of(ctx) {
         let loopId = Math.floor(Math.random() * 10000).toString()
-        return 'for __javascript_loop_index_' + loopId + '=1, #' + this.visit(ctx.array) + ' do\n' +
+        return 'for __javascript_loop_index_' + loopId + '=1, ' + this.visit(ctx.array) + '.length do\n' +
             this.visit(ctx.initialisation_var) + ' = ' + this.visit(ctx.array) + '[__javascript_loop_index_' + loopId + ']\n' +
             this.visit(ctx.body) + '\n' +
             '\nend\n\n'
@@ -492,13 +495,13 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Logical_And.
     visitSingle_Expression_Logical_And(ctx) {
-        return '( ' + this.visit(ctx.exp1) + ' and ' + this.visit(ctx.exp2) + ')'
+        return 'javascript_logical_and(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Logical_Or.
     visitSingle_Expression_Logical_Or(ctx) {
-        return '( ' + this.visit(ctx.exp1) + ' or ' + this.visit(ctx.exp2)
+        return 'javascript_logical_or(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
     }
 
 
@@ -588,12 +591,6 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     }
 
 
-    // Visit a parse tree produced by JavascriptParser#Single_Expression_Parenthesis.
-    visitSingle_Expression_Parenthesis(ctx) {
-        return '(' + this.visit(ctx.expr) + ')'
-    }
-
-
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Variable.
     visitSingle_Expression_Variable(ctx) {
         return ctx.getText()
@@ -632,7 +629,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Array_Literal.
     visitArray_Literal(ctx) {
-        return '{' + this.visitChildren(ctx).filter(x => x !== undefined)[0].join(', ') + '}'
+        return 'Array({' + this.visitChildren(ctx).filter(x => x !== undefined)[0].join(', ') + '})'
     }
 
 
@@ -656,7 +653,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         for (let prop of properties) {
             propertiesAsStrings.push(prop.name + ' = ' + prop.value)
         }
-        return '{ ' + propertiesAsStrings.join(', ') + ' }'
+        return 'Object({ ' + propertiesAsStrings.join(', ') + ' })'
     }
 
 
@@ -737,19 +734,19 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Literal_Null.
     visitLiteral_Null(ctx) {
-        return 'nil'
+        return 'null'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Literal_Boolean.
     visitLiteral_Boolean(ctx) {
-        return ctx.getText()
+        return 'Boolean(' + ctx.getText() + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Literal_String.
     visitLiteral_String(ctx) {
-        return ctx.getText()
+        return 'String(' + ctx.getText() + ')'
     }
 
 
@@ -800,7 +797,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         if (isNegative) {
             finalValue = -finalValue
         }
-        return finalValue.toString()
+        return 'Number(' + finalValue.toString() + ')'
     }
 
 
@@ -838,7 +835,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
                     console.error('Hexadecimal digit', c, 'not understood. Ignoring.')
             }
         }
-        return value.toString()
+        return 'Number(' + value.toString() + ')'
     }
 
 
@@ -859,7 +856,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             value = value * 8 + c.charCodeAt() - 48 // character code of 0
         }
 
-        return value.toString()
+        return 'Number(' + value.toString() + ')'
     }
 
 
@@ -889,7 +886,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             }
         }
 
-        return value.toString()
+        return 'Number(' + value.toString() + ')'
     }
 
 
