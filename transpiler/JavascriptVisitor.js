@@ -72,7 +72,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let args = this.visit(ctx.args)
         output += args.map(
             (x, i) => x.isRestParameter
-                ? 'local ' + x.name + ' = javascript_splice(arguments, ' + (i + 1) + ')'
+                ? 'local ' + x.name + ' = __javascript_splice(arguments, ' + (i + 1) + ')'
                 : 'local ' + x.name + ' = arguments[' + (i + 1).toString() + ']' + ' or ' + x.default_value + '\n')
             .join('')
         output += '\n\n' + this.visit(ctx.body) + '\n\nend\n\n'
@@ -277,7 +277,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#If_Statement.
     visitIf_Statement(ctx) {
-        return 'if ( javascript_toBoolean(' + this.visit(ctx.condition) + ').__value ) \n' +
+        return 'if ( __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value ) \n' +
             'then\n' +
             this.visit(ctx.body) +
             '\nend\n\n'
@@ -288,14 +288,14 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitIteration_Statement_Do_While(ctx) {
         return 'repeat\n' +
             this.visit(ctx.body) +
-            '\nuntil(not javascript_toBoolean(' + this.visit(ctx.condition) + ').__value)\n\n'
+            '\nuntil(not __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value)\n\n'
     }
 
 
 
     // Visit a parse tree produced by JavascriptParser#Iteration_Statement_While.
     visitIteration_Statement_While(ctx) {
-        return 'while ( javascript_toBoolean(' + this.visit(ctx.condition) + ').__value )\n' +
+        return 'while ( __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value )\n' +
             'do\n' +
             this.visit(ctx.body) +
             '\nend\n\n'
@@ -307,7 +307,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         return 'repeat\n' + // Wrap in a repeat block so we don't leak variables to outside scope
             (ctx.initialisation_expression ? this.visit(ctx.initialisation_expression) + '\n' : '') +
             (ctx.initialisation_var ? this.visit(ctx.initialisation_var) + '\n' : '') +
-            'while ( javascript_toBoolean(' + this.visit(ctx.condition) + ') )\n' +
+            'while ( __javascript_toBoolean(' + this.visit(ctx.condition) + ') )\n' +
             'do\n' +
             this.visit(ctx.body) + '\n' +
             this.visit(ctx.increment) +
@@ -370,77 +370,77 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Typeof.
     visitSingle_Expression_Typeof(ctx) {
-        return 'javascript_type(' + this.visit(ctx.expression) + ')'
+        return '__javascript_type(' + this.visit(ctx.expression) + ')'
     }
 
 
     // TODO: These 4 rules need a bit of work
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Post_Increment.
     visitSingle_Expression_Post_Increment(ctx) {
-        return 'javascript_post_increment(' + this.visit(ctx.expression) + ')'
+        return '__javascript_post_increment(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Post_Decrement.
     visitSingle_Expression_Post_Decrement(ctx) {
-        return 'javascript_post_decrement(' + this.visit(ctx.expression) + ')'
+        return '__javascript_post_decrement(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Pre_Increment.
     visitSingle_Expression_Pre_Increment(ctx) {
-        return 'javascript_pre_increment(' + this.visit(ctx.expression) + ')'
+        return '__javascript_pre_increment(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Pre_Decrement.
     visitSingle_Expression_Pre_Decrement(ctx) {
-        return 'javascript_pre_decrement(' + this.visit(ctx.expression) + ')'
+        return '__javascript_pre_decrement(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Unary_Plus.
     visitSingle_Expression_Unary_Plus(ctx) {
-        return 'javascript_toNumeric(' + this.visit(ctx.expression) + ')'
+        return '__javascript_toNumeric(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Unary_Minus.
     visitSingle_Expression_Unary_Minus(ctx) {
-        return '-javascript_toNumeric(' + this.visit(ctx.expression) + ')'
+        return '-__javascript_toNumeric(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Bit_Not.
     visitSingle_Expression_Bit_Not(ctx) {
-        return '~javascript_toNumeric(' + this.visit(ctx.expression) + ')'
+        return '~__javascript_toNumeric(' + this.visit(ctx.expression) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Not.
     visitSingle_Expression_Not(ctx) {
-        return '!javascript_toBoolean(' + this.visit(ctx.expression)[0] + ')'
+        return '!__javascript_toBoolean(' + this.visit(ctx.expression)[0] + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Power.
     visitSingle_Expression_Power(ctx) {
-        return '( javascript_toNumeric(' + this.visit(ctx.exp1) + ') ^ javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
+        return '( __javascript_toNumeric(' + this.visit(ctx.exp1) + ') ^ __javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Multiplicative.
     visitSingle_Expression_Multiplicative(ctx) {
-        return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') ' + ctx.operation.text + ' javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
+        return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') ' + ctx.operation.text + ' __javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Additive.
     visitSingle_Expression_Additive(ctx) {
         if (ctx.operation.text == '+') {
-            return 'javascript_add(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')' // Treating addition differently as it has extra steps
+            return '__javascript_add(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')' // Treating addition differently as it has extra steps
         }
-        return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') ' + ctx.operation.text + ' javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
+        return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') ' + ctx.operation.text + ' __javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
     }
 
 
@@ -448,11 +448,11 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitSingle_Expression_Bit_Shift(ctx) {
         let operation = ctx.operation.text
         if (operation == '<<') {
-            return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') << javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
+            return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') << __javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
         } else if (operation == '>>') {
-            return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ javascript_toNumeric(' + this.visit(ctx.exp2) + '))) '
+            return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ __javascript_toNumeric(' + this.visit(ctx.exp2) + '))) '
         } else if (operation == '>>>') {
-            return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
+            return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> __javascript_toNumeric(' + this.visit(ctx.exp2) + ')) '
         }
     }
 
@@ -465,49 +465,49 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Instance_of.
     visitSingle_Expression_Instance_of(ctx) {
-        return 'javascript_instanceof(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
+        return '__javascript_instanceof(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_In.
     visitSingle_Expression_In(ctx) {
-        return 'javascript_hasProperty(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
+        return '__javascript_hasProperty(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Bit_And.
     visitSingle_Expression_Bit_And(ctx) {
-        return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') & toNumeric(' + this.visit(ctx.exp2) + '))'
+        return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') & __javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Bit_Xor.
     visitSingle_Expression_Bit_Xor(ctx) {
-        return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') ~ toNumeric(' + this.visit(ctx.exp2) + '))'
+        return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') ~ __javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Bit_Or.
     visitSingle_Expression_Bit_Or(ctx) {
-        return '(javascript_toNumeric(' + this.visit(ctx.exp1) + ') | toNumeric(' + this.visit(ctx.exp2) + '))'
+        return '(__javascript_toNumeric(' + this.visit(ctx.exp1) + ') | __javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Logical_And.
     visitSingle_Expression_Logical_And(ctx) {
-        return 'javascript_logical_and(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
+        return '__javascript_logical_and(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Logical_Or.
     visitSingle_Expression_Logical_Or(ctx) {
-        return 'javascript_logical_or(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
+        return '__javascript_logical_or(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Ternary.
     visitSingle_Expression_Ternary(ctx) {
-        return '( javascript_toBoolean(' + this.visit(ctx.exp1) + ')? ' + this.visit(ctx.exp2) + ':' + this.visit(ctx.exp3) + ')'
+        return '( __javascript_toBoolean(' + this.visit(ctx.exp1) + ')? ' + this.visit(ctx.exp2) + ':' + this.visit(ctx.exp3) + ')'
     }
 
 
@@ -521,29 +521,29 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitSingle_Expression_Assignment_Operator(ctx) {
         switch (ctx.operator.getText()) {
             case '*=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') * javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') * __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '/=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') / javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') / __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '%=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') % javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') % __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '+=':
-                return this.visit(ctx.exp1) + ' = javascript_add(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')' // Treating addition differently as it has extra steps
+                return this.visit(ctx.exp1) + ' = __javascript_add(' + this.visit(ctx.exp1) + ', ' + this.visit(ctx.exp2) + ')' // Treating addition differently as it has extra steps
             case '-=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') - javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') - __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '<<=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') << javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') << __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '>>=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') // (2 ^ __javascript_toNumeric(' + this.visit(ctx.exp2) + '))'
             case '>>>=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') >> __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '&=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') & javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') & __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '^=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') ~ javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') ~ __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '|=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') | javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') | __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
             case '**=':
-                return this.visit(ctx.exp1) + ' = javascript_toNumeric(' + this.visit(ctx.exp1) + ') ^ javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
+                return this.visit(ctx.exp1) + ' = __javascript_toNumeric(' + this.visit(ctx.exp1) + ') ^ __javascript_toNumeric(' + this.visit(ctx.exp2) + ')'
         }
         console.error('Assignment operator', ctx.operator.getText(), 'not understood. Defaulting to simple assignment')
         return this.visit(ctx.exp1) + '=' + this.visit(ctx.exp2)
@@ -553,7 +553,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // TODO:
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Import.
     visitSingle_Expression_Import(ctx) {
-        return 'javascript_import(' + this.visit(ctx.exp) + ')'
+        return '__javascript_import(' + this.visit(ctx.exp) + ')'
     }
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super_Constructor.
