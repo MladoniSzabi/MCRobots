@@ -1,6 +1,27 @@
 local javascript = {}
 
-local __lua_environment = _G
+function javascript.__prepare_environment()
+    local global_table = {}
+    for key, value in pairs(_G) do
+        if key ~= '_G' then
+            global_table[key] = value
+            _G[key] = nil
+        end
+    end
+
+    _G.__lua_environment = global_table
+
+    for key, value in __lua_environment.pairs(javascript) do
+        _G[key] = value
+    end
+
+    _G.Number = __lua_environment.require('lua_libs.javascript_types.Number')
+    _G.Boolean = __lua_environment.require('lua_libs.javascript_types.Boolean')
+    _G.String = __lua_environment.require('lua_libs.javascript_types.String')
+    _G.Object = __lua_environment.require('lua_libs.javascript_types.Object')
+    _G.Array = __lua_environment.require('lua_libs.javascript_types.Array')
+
+end
 
 function javascript.__javascript_post_increment(expr)
 
@@ -28,13 +49,13 @@ function javascript.__javascript_pre_decrement(expr)
 end
 
 function javascript.__javascript_add(expr1, expr2)
-    if(__lua_environment.type(expr1) == 'string' and __lua_environment.type(expr2) == 'string') then
+    if (__lua_environment.type(expr1) == 'string' and __lua_environment.type(expr2) == 'string') then
         return expr1 .. expr2
     end
-    if (javascript.javascript_instanceof(expr1) == 'string' and javascript.javascript_instanceof(expr2) == 'string') then
+    if (javascript.__javascript_instanceof(expr1) == 'string' and javascript.__javascript_instanceof(expr2) == 'string') then
         return expr1 + expr2
     end
-    return javascript.toNumeric(expr1) + javascript.javascript_toNumeric(expr2)
+    return Number(javascript.__javascript_toNumeric(expr1).__value + javascript.__javascript_toNumeric(expr2).__value)
 end
 
 function javascript.__add_to_global_table(t)
@@ -91,9 +112,20 @@ end
 javascript.console = {}
 
 function javascript.console.log(arguments)
+    -- global tostring is used by print function so need to set it here
+    _G.tostring = __lua_environment.tostring
     for i = 1, #arguments do
-        __lua_environment.print(arguments[i])
+        if __lua_environment.type(arguments[i]) == 'table' and arguments[i].toString then
+            __lua_environment.print(arguments[i].toString())
+        else
+            __lua_environment.print(arguments[i])
+        end
     end
+    if (#arguments == 0) then
+        __lua_environment.print()
+    end
+    -- delete tostring from global since it is not part of javascript
+    _G.tostring = nil
 end
 
 return javascript

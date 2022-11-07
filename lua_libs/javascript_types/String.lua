@@ -1,7 +1,5 @@
 local String = {}
 
-local __lua_environment = _G
-
 function String.__convert_to_string(value)
     if __lua_environment.type(value) == 'nil' then
         return 'undefined'
@@ -176,7 +174,7 @@ function String.toLowerCase(this, arguments)
     return __javascript_not_implemented()
 end
 function String.toString(this, arguments)
-    return __javascript_not_implemented()
+    return this.__value
 end
 function String.toUpperCase(this, arguments)
     return __javascript_not_implemented()
@@ -200,13 +198,14 @@ function String.valueOf(this, arguments)
     return __javascript_not_implemented()
 end
 
-function String.__init(value)
+function String:__init(value)
     local inst = {}
     inst.__value = String.__convert_to_string(value)
 
     __lua_environment.setmetatable(inst, {
         __index = function(t, key)
             if key == '__value' then
+                --print({__lua_environment.rawget(inst, '__value')})
                 return __lua_environment.rawget(inst, '__value')
             elseif key == '__type' then
                 return 'string'
@@ -218,7 +217,7 @@ function String.__init(value)
                 return (__lua_environment.rawget(inst, '__value'))[key.__value]
             elseif String[key] then
                 return function(arguments)
-                    String[key](inst, arguments)
+                    return String[key](inst, arguments)
                 end
             end
         end,
@@ -247,4 +246,4 @@ __lua_environment.setmetatable(String, {
     __call = String.__init
 })
 
-return {String}
+return String

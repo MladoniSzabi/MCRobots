@@ -6,8 +6,8 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Program_Start.
     visitProgram_Start(ctx) {
-        return 'local js = require "lua_libs/javascript_functions"\n' +
-            'js.add_to_table(js)\n' +
+        return 'local js = require "lua_libs.javascript_functions"\n' +
+            'js.__prepare_environment()\n' +
             this.visitChildren(ctx).join('\n')
     }
 
@@ -173,7 +173,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             'local inst = {}\n' +
             'local __javascript_class_properties = {}\n' +
             'local __javascript_parent = {}\n' +
-            'setmetatable(__javascript_parent, { __index = function(t,key)\n' +
+            '__lua_environment.setmetatable(__javascript_parent, { __index = function(t,key)\n' +
             'return ' + (ctx.parent_class ? ('function(arguments) ' + this.visit(ctx.parent_class) + '.__javascript_get_internal_method(key)(inst, arguments) end') : 'nil') + '\n' +
             'end\n' +
             '})\n' +
@@ -181,7 +181,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             'if(inst.constructor) then \n' +
             'inst.constructor(arguments)\n' +
             'end\n' +
-            'setmetatable(inst, { __index = function(t, key)\n' +
+            '__lua_environment.setmetatable(inst, { __index = function(t, key)\n' +
             'if(key=="__type") then\n' +
             'return "object"\n' +
             'end\n' +

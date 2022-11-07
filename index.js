@@ -36,6 +36,21 @@ t2.sayHi()
 t2.sayBoo()
 console.log(t2.asd)
 console.log(t2.dsa)
+
+console.log()
+console.log("--------")
+console.log()
+
+let a = 1
+console.log(a == 1)
+a++
+console.log(a)
+a *= 3
+console.log(a)
+let b = "ASD"
+console.log(b)
+
+
 `;
 
 const chars = new antlr4.InputStream(input);

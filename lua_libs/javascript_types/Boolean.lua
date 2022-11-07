@@ -1,7 +1,5 @@
 local Boolean = {}
 
-local __lua_environment = _G
-
 function Boolean.__convert_to_boolean(value)
     if __lua_environment.type(value) == 'nil' then
         return false
@@ -52,14 +50,14 @@ function Boolean.toLocaleString(this, arguments)
     return __javascript_not_implemented()
 end
 function Boolean.toString(this, arguments)
-    return __javascript_not_implemented()
+    return String(this.__value).__value
 end
 function Boolean.valueOf(this, arguments)
     return __javascript_not_implemented()
 end
 
 
-function Boolean.__init(value)
+function Boolean:__init(value)
     local inst = {}
     inst.__value = Boolean.__convert_to_boolean(value)
     __lua_environment.setmetatable(inst, {
@@ -70,7 +68,7 @@ function Boolean.__init(value)
                 return 'boolean'
             elseif Boolean[key] then
                 return function(arguments)
-                    Boolean[key](inst, arguments)
+                    return Boolean[key](inst, arguments)
                 end
             end
         end
@@ -82,4 +80,4 @@ __lua_environment.setmetatable(Boolean, {
     __call = Boolean.__init
 })
 
-return {Boolean}
+return Boolean

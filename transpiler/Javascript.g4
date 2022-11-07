@@ -103,6 +103,7 @@ singleExpression:
 		| '>'
 		| '<='
 		| '>='
+		| '=='
 	) exp2 = singleExpression															# Single_Expression_Relational
 	| exp1 = singleExpression Instanceof exp2 = singleExpression						# Single_Expression_Instance_of
 	| exp1 = singleExpression In exp2 = singleExpression								# Single_Expression_In

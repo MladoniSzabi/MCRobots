@@ -1,7 +1,5 @@
 local Object = {}
 
-local __lua_environment = _G
-
 function Object.__convert_to_object(value)
     if __lua_environment.type(value) == 'nil' then
         return false
@@ -52,14 +50,14 @@ function Object.toLocaleString(this, arguments)
     return __javascript_not_implemented()
 end
 function Object.toString(this, arguments)
-    return __javascript_not_implemented()
+    return "[object Object]"
 end
 function Object.valueOf(this, arguments)
     return __javascript_not_implemented()
 end
 
 
-function Object.__init(value)
+function Object:__init(value)
     local inst = {}
     inst.__value = Object.__convert_to_object(value)
     __lua_environment.setmetatable(inst, {
@@ -70,7 +68,7 @@ function Object.__init(value)
                 return 'object'
             elseif Object[key] then
                 return function(arguments)
-                    Object[key](inst, arguments)
+                    return Object[key](inst, arguments)
                 end
             end
         end
@@ -82,4 +80,4 @@ __lua_environment.setmetatable(Object, {
     __call = Object.__init
 })
 
-return {Object}
+return Object

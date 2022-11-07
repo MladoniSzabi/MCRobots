@@ -1,7 +1,5 @@
 local Number = {}
 
-local __lua_environment = _G
-
 function Number.__convert_to_number(value)
     if __lua_environment.type(value) == 'nil' then
         return 0
@@ -69,13 +67,13 @@ function Number.toPrecision(this, arguments)
     return __javascript_not_implemented()
 end
 function Number.toString(this, arguments)
-    return __javascript_not_implemented()
+    return String(this.__value).__value
 end
 function Number.valueOf(this, arguments)
     return __javascript_not_implemented()
 end
 
-function Number.__init(value)
+function Number:__init(value)
     local inst = {}
     inst.__value = Number.__convert_to_number(value)
     __lua_environment.setmetatable(inst, {
@@ -86,7 +84,7 @@ function Number.__init(value)
                 return 'number'
             elseif Number[key] then
                 return function(arguments)
-                    Number[key](inst, arguments)
+                    return Number[key](inst, arguments)
                 end
             end
         end,
@@ -116,7 +114,7 @@ function Number.__init(value)
         end,
 
         __eq = function(op1, op2)
-            return Number(Number(op1).__value == Number(op2).__value)
+            return Boolean(Number(op1).__value == Number(op2).__value)
         end,
 
         __lt = function(op1, op2)
@@ -127,11 +125,11 @@ function Number.__init(value)
             return Boolean(Number(op1).__value <= Number(op2).__value)
         end
     })
-    return isnt
+    return inst
 end
 
 __lua_environment.setmetatable(Number, {
     __call = Number.__init
 })
 
-return {Number}
+return Number

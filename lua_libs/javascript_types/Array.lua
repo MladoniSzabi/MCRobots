@@ -1,7 +1,5 @@
 local Array = {}
 
-local __lua_environment = _G
-
 function Array.__convert_to_array(value)
     if #value == 1 then
         return value
@@ -18,125 +16,125 @@ end
 function Array.at(this, arguments)
     return __javascript_not_implemented()
 end
-function String.concat(this, arguments)
+function Array.concat(this, arguments)
     return __javascript_not_implemented()
 end
-function String.constructor(this, arguments)
+function Array.constructor(this, arguments)
     return __javascript_not_implemented()
 end
-function String.copyWithin(this, arguments)
+function Array.copyWithin(this, arguments)
     return __javascript_not_implemented()
 end
-function String.entries(this, arguments)
+function Array.entries(this, arguments)
     return __javascript_not_implemented()
 end
-function String.every(this, arguments)
+function Array.every(this, arguments)
     return __javascript_not_implemented()
 end
-function String.fill(this, arguments)
+function Array.fill(this, arguments)
     return __javascript_not_implemented()
 end
-function String.filter(this, arguments)
+function Array.filter(this, arguments)
     return __javascript_not_implemented()
 end
-function String.find(this, arguments)
+function Array.find(this, arguments)
     return __javascript_not_implemented()
 end
-function String.findIndex(this, arguments)
+function Array.findIndex(this, arguments)
     return __javascript_not_implemented()
 end
-function String.fillLast(this, arguments)
+function Array.fillLast(this, arguments)
     return __javascript_not_implemented()
 end
-function String.fillLastIndex(this, arguments)
+function Array.fillLastIndex(this, arguments)
     return __javascript_not_implemented()
 end
-function String.flat(this, arguments)
+function Array.flat(this, arguments)
     return __javascript_not_implemented()
 end
-function String.flatMap(this, arguments)
+function Array.flatMap(this, arguments)
     return __javascript_not_implemented()
 end
-function String.forEach(this, arguments)
+function Array.forEach(this, arguments)
     return __javascript_not_implemented()
 end
-function String.hasOwnProperty(this, arguments)
+function Array.hasOwnProperty(this, arguments)
     return __javascript_not_implemented()
 end
-function String.includes(this, arguments)
+function Array.includes(this, arguments)
     return __javascript_not_implemented()
 end
-function String.indexOf(this, arguments)
+function Array.indexOf(this, arguments)
     return __javascript_not_implemented()
 end
-function String.isPrototypeOf(this, arguments)
+function Array.isPrototypeOf(this, arguments)
     return __javascript_not_implemented()
 end
-function String.join(this, arguments)
+function Array.join(this, arguments)
     return __javascript_not_implemented()
 end
-function String.keys(this, arguments)
+function Array.keys(this, arguments)
     return __javascript_not_implemented()
 end
-function String.lastIndexOf(this, arguments)
+function Array.lastIndexOf(this, arguments)
     return __javascript_not_implemented()
 end
-function String.map(this, arguments)
+function Array.map(this, arguments)
     return __javascript_not_implemented()
 end
-function String.pop(this, arguments)
+function Array.pop(this, arguments)
     return __javascript_not_implemented()
 end
-function String.propertyIsEnumerable(this, arguments)
+function Array.propertyIsEnumerable(this, arguments)
     return __javascript_not_implemented()
 end
-function String.push(this, arguments)
+function Array.push(this, arguments)
     return __javascript_not_implemented()
 end
-function String.reduce(this, arguments)
+function Array.reduce(this, arguments)
     return __javascript_not_implemented()
 end
-function String.reduceRight(this, arguments)
+function Array.reduceRight(this, arguments)
     return __javascript_not_implemented()
 end
-function String.reverse(this, arguments)
+function Array.reverse(this, arguments)
     return __javascript_not_implemented()
 end
-function String.shift(this, arguments)
+function Array.shift(this, arguments)
     return __javascript_not_implemented()
 end
-function String.slice(this, arguments)
+function Array.slice(this, arguments)
     return __javascript_not_implemented()
 end
-function String.some(this, arguments)
+function Array.some(this, arguments)
     return __javascript_not_implemented()
 end
-function String.sort(this, arguments)
+function Array.sort(this, arguments)
     return __javascript_not_implemented()
 end
-function String.splice(this, arguments)
+function Array.splice(this, arguments)
     return __javascript_not_implemented()
 end
-function String.toLocaleString(this, arguments)
+function Array.toLocaleString(this, arguments)
     return __javascript_not_implemented()
 end
-function String.toLocaleUpperCase(this, arguments)
+function Array.toLocaleUpperCase(this, arguments)
     return __javascript_not_implemented()
 end
-function String.toString(this, arguments)
+function Array.toString(this, arguments)
     return __javascript_not_implemented()
 end
-function String.unshift(this, arguments)
+function Array.unshift(this, arguments)
     return __javascript_not_implemented()
 end
-function String.valueOf(this, arguments)
+function Array.valueOf(this, arguments)
     return __javascript_not_implemented()
 end
-function String.values(this, arguments)
+function Array.values(this, arguments)
     return __javascript_not_implemented()
 end
 
-function Array.__init(value)
+function Array:__init(value)
     local inst = {}
     inst.__value = Array.__convert_to_array(value)
     __lua_environment.setmetatable(inst, {
@@ -153,7 +151,7 @@ function Array.__init(value)
                 return (__lua_environment.rawget(inst, '__value'))[key.__value]
             elseif Array[key] then
                 return function(arguments)
-                    Array[key](inst, arguments)
+                    return Array[key](inst, arguments)
                 end
             end
         end,
@@ -177,10 +175,12 @@ function Array.__init(value)
             return __javascript_not_implemented()
         end
     })
+
+    return inst
 end
 
 __lua_environment.setmetatable(Array, {
     __call = Array.__init
 })
 
-return {Array}
+return Array
