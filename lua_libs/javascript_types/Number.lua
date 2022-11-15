@@ -89,11 +89,11 @@ function Number:__init(value)
             end
         end,
 
-        _add = function(op1, op2)
+        __add = function(op1, op2)
             return Number(Number(op1).__value + Number(op2).__value)
         end,
 
-        _sub = function(op1, op2)
+        __sub = function(op1, op2)
             return Number(Number(op1).__value - Number(op2).__value)
         end,
 
@@ -107,6 +107,38 @@ function Number:__init(value)
 
         __mod = function(op1, op2)
             return Number(Number(op1).__value % Number(op2).__value)
+        end,
+
+        __pow = function(op1, op2)
+            return Number(Number(op1).__value ^ Number(op2).__value)
+        end,
+
+        __idiv = function(op1, op2)
+            return Number(Number(op1).__value // Number(op2).__value)
+        end,
+
+        __band = function(op1, op2)
+            return Number(Number(op1).__value & Number(op2).__value)
+        end,
+        
+        __bor = function(op1, op2)
+            return Number(Number(op1).__value | Number(op2).__value)
+        end,
+
+        __bxor = function(op1, op2)
+            return Number(Number(op1).__value ~ Number(op2).__value)
+        end,
+        
+        __bnot = function(op1)
+            return Number(~Number(op1).__value)
+        end,
+        
+        __shl = function(op1, op2)
+            return Number(Number(op1).__value << Number(op2).__value)
+        end,
+        
+        __shr = function(op1, op2)
+            return Number(Number(op1).__value >> Number(op2).__value)
         end,
 
         __unm = function(op1)

@@ -3,9 +3,16 @@ import JavascriptVisitor from '../lib/JavascriptVisitor.js'
 export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     classStack = []
+    isTranspilingTests = false
+    fileName = ""
 
     // Visit a parse tree produced by JavascriptParser#Program_Start.
     visitProgram_Start(ctx) {
+        if(this.isTranspilingTests) {
+            return 'local js = require "tests.testlibs"\n' +
+            'js.__prepare_environment()\n' +
+            this.visitChildren(ctx).join('\n')
+        }
         return 'local js = require "lua_libs.javascript_functions"\n' +
             'js.__prepare_environment()\n' +
             this.visitChildren(ctx).join('\n')
@@ -355,6 +362,12 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         return this.visit(ctx.class_name) + '.new({})'
     }
 
+    // Visit a parse tree produced by JavascriptParser#Single_Expression_Assert.
+    visitSingle_Expression_Assert(ctx) {
+        let args = this.visit(ctx.function_arguments)
+        return 'assert(' + args.substring(2, args.length-2) + ', "' + this.fileName + '", ' + ctx.function_arguments.start.line + ')'
+    }
+
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Call.
     visitSingle_Expression_Call(ctx) {
@@ -459,7 +472,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Relational.
     visitSingle_Expression_Relational(ctx) {
-        return '(' + this.visit(ctx.exp1) + ' ' + ctx.operation.text + ' ' + this.visit(ctx.exp2) + ') '
+        return '__javascript_toBoolean(' + this.visit(ctx.exp1) + ' ' + ctx.operation.text + ' ' + this.visit(ctx.exp2) + ') '
     }
 
 

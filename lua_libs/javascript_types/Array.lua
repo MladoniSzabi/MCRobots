@@ -156,7 +156,7 @@ function Array:__init(value)
             end
         end,
 
-        _add = function(op1, op2)
+        __add = function(op1, op2)
             return String(String(op1) + String(op2))
         end,
 

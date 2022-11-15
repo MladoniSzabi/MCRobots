@@ -80,6 +80,7 @@ singleExpression:
 		Single_Expression_Instantiate_With_Args
 	| New class_name = singleExpression # Single_Expression_Instantiate
 	// | anonymousFunction
+	| 'assert' function_arguments = arguments										# Single_Expression_Assert
 	| function_name = singleExpression function_arguments = arguments				# Single_Expression_Call
 	| Delete expression = singleExpression											# Single_Expression_Delete
 	| Typeof expression = singleExpression											# Single_Expression_Typeof
@@ -114,8 +115,9 @@ singleExpression:
 	| exp1 = singleExpression '||' exp2 = singleExpression								# Single_Expression_Logical_Or
 	| exp1 = singleExpression '?' exp2 = singleExpression ':' exp3 = singleExpression	#
 		Single_Expression_Ternary
-	| <assoc = right> exp1 = singleExpression '=' singleExpression									# Single_Expression_Assignment
-	| <assoc = right> exp1 = singleExpression operator = assignmentOperator exp2 = singleExpression	#
+	| <assoc = right> exp1 = singleExpression '=' exp2 = singleExpression #
+		Single_Expression_Assignment
+	| <assoc = right> exp1 = singleExpression operator = assignmentOperator exp2 = singleExpression #
 		Single_Expression_Assignment_Operator
 	| Import '(' exp = singleExpression ')'	# Single_Expression_Import
 	| Super constructor_args = arguments	# Single_Expression_Super_Constructor
@@ -188,6 +190,9 @@ numericLiteral:
 
 eos: SemiColon;
 
+MultiLineComment: '/*' .*? '*/' -> channel(HIDDEN);
+SingleLineComment:
+	'//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 WhiteSapce: [\n ] -> skip;
 SemiColon: ';';
 Ellipsis: '...';

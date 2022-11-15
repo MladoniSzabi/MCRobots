@@ -222,7 +222,7 @@ function String:__init(value)
             end
         end,
 
-        _add = function(op1, op2)
+        __add = function(op1, op2)
             return String(String(op1).__value .. String(op2).__value)
         end,
 
