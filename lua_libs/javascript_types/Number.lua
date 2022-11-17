@@ -146,15 +146,15 @@ function Number:__init(value)
         end,
 
         __eq = function(op1, op2)
-            return Boolean(Number(op1).__value == Number(op2).__value)
+            return Number(op1).__value == Number(op2).__value
         end,
 
         __lt = function(op1, op2)
-            return Boolean(Number(op1).__value < Number(op2).__value)
+            return Number(op1).__value < Number(op2).__value
         end,
 
         __le = function(op1, op2)
-            return Boolean(Number(op1).__value <= Number(op2).__value)
+            return Number(op1).__value <= Number(op2).__value
         end
     })
     return inst

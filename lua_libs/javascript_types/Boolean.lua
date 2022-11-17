@@ -71,7 +71,11 @@ function Boolean:__init(value)
                     return Boolean[key](inst, arguments)
                 end
             end
-        end
+        end,
+
+        __eq = function(op1, op2)
+            return Boolean(op1).__value == Boolean(op2).__value
+        end,
     })
     return inst
 end

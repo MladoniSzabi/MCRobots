@@ -1,8 +1,8 @@
 // test basic assignments
 let a = 1
-let b = 2
+let b = 4
 assert(a == 1)
-assert(b == 3)
+assert(b == 4)
 
 // test assignment operators
 a -= 3
@@ -15,13 +15,14 @@ a /= 3
 assert(a == -2)
 a *= -1
 assert(a == 2)
+a = 4
 a %= 3
 assert(a == 1)
-a >>= 2
+a <<= 2
 assert(a == 4)
 a **= 2
-assert(a == 8)
-a <<= 1
+assert(a == 16)
+a >>= 2
 assert(a == 4)
 a |= 1
 assert(a == 5)
@@ -41,7 +42,7 @@ c = a / 4
 assert(c == 0.5)
 c = c ** 3
 assert(c == 0.125)
-c = (2 << 6) ** 0.5 + 1 * 2
+c = (2 << 5) ** 0.5 + 1 * 2
 assert(c == 10)
 c = c & 24
 assert(c == 8)

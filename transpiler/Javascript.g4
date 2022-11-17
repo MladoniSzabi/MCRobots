@@ -105,6 +105,7 @@ singleExpression:
 		| '<='
 		| '>='
 		| '=='
+		| '!='
 	) exp2 = singleExpression															# Single_Expression_Relational
 	| exp1 = singleExpression Instanceof exp2 = singleExpression						# Single_Expression_Instance_of
 	| exp1 = singleExpression In exp2 = singleExpression								# Single_Expression_In
@@ -235,7 +236,7 @@ OctalIntegerLiteral: '0' [0-7]+;
 OctalIntegerLiteral2: '0' [oO] [0-7] [_0-7]*;
 BinaryIntegerLiteral: '0' [bB] [01] [_01]*;
 
-VariableName: [_a-zA-Z][_a-zA-Z\-0-9]*;
+VariableName: [_a-zA-Z][_a-zA-Z0-9]*;
 
 fragment DoubleStringCharacter: ~["\\\r\n] | '\\"';
 fragment SingleStringCharacter: ~['\\\r\n] | '\\\'';

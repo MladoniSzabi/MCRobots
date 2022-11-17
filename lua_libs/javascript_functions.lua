@@ -73,7 +73,10 @@ function javascript.__javascript_toBoolean(val)
 end
 
 function javascript.__javascript_type(val)
-    return val.__type or __lua_environment.type(val)
+    if __lua_environment.type(val) == "table" then
+        return val.__type or __lua_environment.type(val)
+    end
+    return __lua_environment.type(val)
 end
 
 function javascript.__javascript_instanceof(val, class)
