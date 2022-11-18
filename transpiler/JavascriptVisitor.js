@@ -77,7 +77,10 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Function_Declaration.
     visitFunction_Declaration(ctx) {
         let output = 'function ' + ctx.function_name.text + '(arguments)\n\n'
-        let args = this.visit(ctx.args)
+        let args = []
+        if(ctx.args) {
+            args = this.visit(ctx.args)
+        }
         output += args.map(
             (x, i) => x.isRestParameter
                 ? 'local ' + x.name + ' = __javascript_splice(arguments, ' + (i + 1) + ')'
