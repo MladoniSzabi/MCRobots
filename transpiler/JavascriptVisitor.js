@@ -9,10 +9,10 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Program_Start.
     visitProgram_Start(ctx) {
-        if(this.isTranspilingTests) {
+        if (this.isTranspilingTests) {
             return 'local js = require "tests.testlibs"\n' +
-            'js.__prepare_environment()\n' +
-            this.visitChildren(ctx).join('\n')
+                'js.__prepare_environment()\n' +
+                this.visitChildren(ctx).join('\n')
         }
         return 'local js = require "lua_libs.javascript_functions"\n' +
             'js.__prepare_environment()\n' +
@@ -52,7 +52,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Statement_List_Continue.
     visitStatement_List_Continue(ctx) {
-        return 'goto continue_' + this.loopStack[this.loopStack.length-1]
+        return 'goto continue_' + this.loopStack[this.loopStack.length - 1]
     }
 
 
@@ -78,7 +78,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitFunction_Declaration(ctx) {
         let output = 'function ' + ctx.function_name.text + '(arguments)\n\n'
         let args = []
-        if(ctx.args) {
+        if (ctx.args) {
             args = this.visit(ctx.args)
         }
         output += args.map(
@@ -291,18 +291,19 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         return 'if ( __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value ) \n' +
             'then\n' +
             this.visit(ctx.body) +
+            (ctx.else_body ? ('\nelse\n' + this.visit(ctx.else_body)) : '') +
             '\nend\n\n'
     }
 
 
     // Visit a parse tree produced by JavascriptParser#Iteration_Statement_Do_While.
     visitIteration_Statement_Do_While(ctx) {
-        let loopId = Math.floor(Math.random()*1000000)
+        let loopId = Math.floor(Math.random() * 1000000)
         this.loopStack.push(loopId)
         let output = 'repeat\n' +
-        this.visit(ctx.body) +
-        '\n::continue_' + loopId.toString() + '::\n' +
-        '\nuntil(not __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value)\n\n'
+            this.visit(ctx.body) +
+            '\n::continue_' + loopId.toString() + '::\n' +
+            '\nuntil(not __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value)\n\n'
         this.loopStack.pop()
         return output
     }
@@ -311,9 +312,9 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Iteration_Statement_While.
     visitIteration_Statement_While(ctx) {
-        let loopId = Math.floor(Math.random()*1000000)
+        let loopId = Math.floor(Math.random() * 1000000)
         this.loopStack.push(loopId)
-        let output =  'while ( __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value )\n' +
+        let output = 'while ( __javascript_toBoolean(' + this.visit(ctx.condition) + ').__value )\n' +
             'do\n' +
             this.visit(ctx.body) +
             '\n::continue_' + loopId.toString() + '::' +
@@ -325,7 +326,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Iteration_Statement_For.
     visitIteration_Statement_For(ctx) {
-        let loopId = Math.floor(Math.random()*1000000)
+        let loopId = Math.floor(Math.random() * 1000000)
         this.loopStack.push(loopId)
         let output = 'repeat\n' + // Wrap in a repeat block so we don't leak variables to outside scope
             (ctx.initialisation_expression ? this.visit(ctx.initialisation_expression) + '\n' : '') +
@@ -346,7 +347,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitIteration_Statement_For_In(ctx) {
         let loopId = Math.floor(Math.random() * 10000).toString()
         this.loopStack.push(loopId)
-        let output = 'for  __javascript_loop_key_' + loopId + ', __javascript_loop_value_' + loopId + ' in pairs(' + this.visit(ctx.dictionary) + ') do\n' +
+        let output = 'for  __javascript_loop_key_' + loopId + ', __javascript_loop_value_' + loopId + ' in __lua_environment.pairs(' + this.visit(ctx.dictionary) + '.__value ) do\n' +
             this.visit(ctx.initialisation_var) + ', __javascript_unused_variable' + ' = __javascript_loop_key_' + loopId + ', __javascript_loop_value_' + loopId + '\n' +
             this.visit(ctx.body) + '\n' +
             '\n::continue_' + loopId.toString() + '::' +
@@ -360,7 +361,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitIteration_Statement_For_Of(ctx) {
         let loopId = Math.floor(Math.random() * 10000).toString()
         this.loopStack.push(loopId)
-        let output = 'for __javascript_loop_index_' + loopId + '=1, ' + this.visit(ctx.array) + '.length do\n' +
+        let output = 'for __javascript_loop_index_' + loopId + '=0, ' + this.visit(ctx.array) + '.length.__value-1 do\n' +
             this.visit(ctx.initialisation_var) + ' = ' + this.visit(ctx.array) + '[__javascript_loop_index_' + loopId + ']\n' +
             this.visit(ctx.body) + '\n' +
             '\n::continue_' + loopId.toString() + '::' +
@@ -369,6 +370,11 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         return output
     }
 
+
+    // Visit a parse tree produced by JavascriptParser#Single_Expression_Member_Index_Expression
+    visitSingle_Expression_Member_Index_Expression(ctx) {
+        return this.visit(ctx.member) + '[' + this.visit(ctx.member_content) + ']'
+    }
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Member_Dot_Expression.
     visitSingle_Expression_Member_Dot_Expression(ctx) {
@@ -392,7 +398,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Assert.
     visitSingle_Expression_Assert(ctx) {
         let args = this.visit(ctx.function_arguments)
-        return 'assert(' + args.substring(2, args.length-2) + ', "' + this.fileName + '", ' + ctx.function_arguments.start.line + ')'
+        return 'assert(' + args.substring(2, args.length - 2) + ', "' + this.fileName + '", ' + ctx.function_arguments.start.line + ')'
     }
 
 
@@ -500,7 +506,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Relational.
     visitSingle_Expression_Relational(ctx) {
         let operator = ctx.operation.text
-        if(operator == '!=') {
+        if (operator == '!=') {
             operator = '~='
         }
         return '__javascript_toBoolean(' + this.visit(ctx.exp1) + ' ' + operator + ' ' + this.visit(ctx.exp2) + ') '
@@ -679,7 +685,11 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Element_List.
     visitElement_List(ctx) {
-        let arrayElements = this.visitChildren(ctx).filter(x => x !== undefined)
+        let arr = this.visitChildren(ctx)
+        let arrayElements = []
+        if(arr !== null) {
+            arrayElements = arr.filter(x => x !== undefined)
+        }
         return arrayElements
     }
 
@@ -834,7 +844,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
         let finalValue
         if (decimalPartLength != 0) {
-            finalValue = (integerPart + decimalPart / 10**decimalPartLength) * (10 ** exponent)
+            finalValue = (integerPart + decimalPart / 10 ** decimalPartLength) * (10 ** exponent)
         } else {
             finalValue = integerPart * (10 ** exponent)
         }

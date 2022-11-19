@@ -74,7 +74,9 @@ methodDefinition:
 		# Method_Definition;
 
 singleExpression:
-	member = singleExpression '.' member_content = VariableName #
+	member = singleExpression '[' member_content = expressionSequence ']' #
+		Single_Expression_Member_Index_Expression
+	| member = singleExpression '.' member_content = VariableName #
 		Single_Expression_Member_Dot_Expression
 	| New class_name = singleExpression new_arguments = arguments #
 		Single_Expression_Instantiate_With_Args

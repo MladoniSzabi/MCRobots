@@ -212,9 +212,9 @@ function String:__init(value)
             elseif key == 'length' then
                 return #(__lua_environment.rawget(inst, '__value'))
             elseif __lua_environment.type(key) == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key]
+                return (__lua_environment.rawget(inst, '__value'))[key+1]
             elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key.__value]
+                return (__lua_environment.rawget(inst, '__value'))[key.__value+1]
             elseif String[key] then
                 return function(arguments)
                     return String[key](inst, arguments)
@@ -227,15 +227,15 @@ function String:__init(value)
         end,
 
         __eq = function(op1, op2)
-            return Boolean(String(op1).__value == String(op2).__value)
+            return String(op1).__value == String(op2).__value
         end,
 
         __lt = function(op1, op2)
-            return Boolean(String(op1).__value < String(op2).__value)
+            return String(op1).__value < String(op2).__value
         end,
 
         __le = function(op1, op2)
-            return Boolean(String(op1).__value <= String(op2).__value)
+            return String(op1).__value <= String(op2).__value
         end
     })
 

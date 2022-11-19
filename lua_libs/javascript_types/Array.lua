@@ -1,15 +1,15 @@
 local Array = {}
 
 function Array.__convert_to_array(value)
-    if #value == 1 then
-        return value
-    end
-
     if value.__javascript_class == 'Array' then
         return value.__value
     end
+
+    if #value == 1 then
+        return {value}
+    end
     
-    return {value}
+    return value
 end
 
 
@@ -88,9 +88,14 @@ end
 function Array.propertyIsEnumerable(this, arguments)
     return __javascript_not_implemented()
 end
+
 function Array.push(this, arguments)
-    return __javascript_not_implemented()
+    for i = 0,#arguments do
+        __lua_environment.table.insert(this.__value, arguments[i])
+    end
+    return Number(#this.__value)
 end
+
 function Array.reduce(this, arguments)
     return __javascript_not_implemented()
 end
@@ -144,11 +149,11 @@ function Array:__init(value)
             elseif key == '__type' then
                 return 'object'
             elseif key == 'length' then
-                return #(__lua_environment.rawget(inst, '__value'))
+                return Number(#(__lua_environment.rawget(inst, '__value')))
             elseif __lua_environment.type(key) == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key]
+                return (__lua_environment.rawget(inst, '__value'))[key+1]
             elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key.__value]
+                return (__lua_environment.rawget(inst, '__value'))[key.__value+1]
             elseif Array[key] then
                 return function(arguments)
                     return Array[key](inst, arguments)
