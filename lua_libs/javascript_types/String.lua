@@ -19,17 +19,17 @@ function String.__convert_to_string(value)
                 return value.toString()
             end
             return "[object Object]"
-        elseif value.__type == 'null' then
+        elseif value.__type.__value == 'null' then
             return 'null'
-        elseif value.__type == 'boolean' then
+        elseif value.__type.__value == 'boolean' then
             if value.__value then
                 return 'true'
             else
                 return 'false'
             end
-        elseif value.__type == 'string' then
+        elseif value.__type.__value == 'string' then
             return value.__value
-        elseif value.__type == 'object' then
+        elseif value.__type.__value == 'object' then
             if value.toString then
                 return value.toString()
             end
@@ -208,7 +208,7 @@ function String:__init(value)
                 --print({__lua_environment.rawget(inst, '__value')})
                 return __lua_environment.rawget(inst, '__value')
             elseif key == '__type' then
-                return 'string'
+                return String('string')
             elseif key == 'length' then
                 return #(__lua_environment.rawget(inst, '__value'))
             elseif __lua_environment.type(key) == 'number' then
@@ -223,19 +223,19 @@ function String:__init(value)
         end,
 
         __add = function(op1, op2)
-            return String(String(op1).__value .. String(op2).__value)
+            return String(String.__convert_to_string(op1) .. String.__convert_to_string(op2))
         end,
 
         __eq = function(op1, op2)
-            return String(op1).__value == String(op2).__value
+            return String.__convert_to_string(op1) == String.__convert_to_string(op2)
         end,
 
         __lt = function(op1, op2)
-            return String(op1).__value < String(op2).__value
+            return String.__convert_to_string(op1) < String.__convert_to_string(op2)
         end,
 
         __le = function(op1, op2)
-            return String(op1).__value <= String(op2).__value
+            return String.__convert_to_string(op1) <= String.__convert_to_string(op2)
         end
     })
 

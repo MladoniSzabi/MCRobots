@@ -56,7 +56,7 @@ formalParameterArg:
 	name = VariableName ('=' default_value = singleExpression)? # Formal_Parameter_Arg;
 lastFormalParameterArg:
 	Ellipsis name = singleExpression # Last_Formal_Parameter_Arg;
-functionBody: '{' statementList+ '}' # Function_Body;
+functionBody: '{' statementList* '}' # Function_Body;
 
 classDeclaration:
 	Class class_name = VariableName (

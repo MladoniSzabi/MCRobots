@@ -147,7 +147,7 @@ function Array:__init(value)
             if key == '__value' then
                 return __lua_environment.rawget(inst, '__value')
             elseif key == '__type' then
-                return 'object'
+                return String('object')
             elseif key == 'length' then
                 return Number(#(__lua_environment.rawget(inst, '__value')))
             elseif __lua_environment.type(key) == 'number' then

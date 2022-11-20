@@ -12,13 +12,13 @@ function Object.__convert_to_object(value)
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
             return value
-        elseif value.__type == 'null' then
+        elseif value.__type == String('null') then
             return {}
-        elseif value.__type == 'boolean' then
+        elseif value.__type == String('boolean') then
             return value
-        elseif value.__type == 'string' then
+        elseif value.__type == String('string') then
             return value
-        elseif value.__type == 'object' then
+        elseif value.__type == String('object') then
             if value.length then
                 return value
             else
@@ -66,7 +66,7 @@ function Object:__init(value)
             if key == '__value' then
                 return __lua_environment.rawget(inst, '__value')
             elseif key == '__type' then
-                return 'object'
+                return String('object')
             elseif __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key) then
                 return __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key)
             elseif __lua_environment.type(key) == 'table' and key.__type == 'string' and __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key.__value) then

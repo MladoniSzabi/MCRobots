@@ -135,7 +135,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
         let inheritProperties = ''
         if (ctx.parent_class) {
-            inheritProperties += this.visit(ctx.parent_class) + '.__javascript_add_default_properties(inst)'
+            inheritProperties += this.visit(ctx.parent_class) + '.__javascript_add_default_properties(__javascript_class_properties)'
         }
 
         let classContent = this.visit(ctx.class_content)
@@ -178,6 +178,9 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             'if(' + ctx.class_name.text + '.__javascript_parent_class) then\n' +
             ctx.class_name.text + '.__javascript_parent_class.__javascript_add_default_properties(inst)\n' +
             'end\n' +
+            'for key,value in __lua_environment.pairs(' + ctx.class_name.text + '.__javascript_default_properties) do\n' +
+            'inst[key] = value\n' +
+            'end\n' +
             'end\n\n' +
             propertyImplementations +
             'function ' + ctx.class_name.text + '.new(arguments)\n' +
@@ -185,31 +188,36 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             'local __javascript_class_properties = {}\n' +
             'local __javascript_parent = {}\n' +
             '__lua_environment.setmetatable(__javascript_parent, { __index = function(t,key)\n' +
-            'return ' + (ctx.parent_class ? ('function(arguments) ' + this.visit(ctx.parent_class) + '.__javascript_get_internal_method(key)(inst, arguments) end') : 'nil') + '\n' +
+            'return ' + (ctx.parent_class ? ('function(arguments) return ' + this.visit(ctx.parent_class) + '.__javascript_get_internal_method(key)(inst, arguments) end') : 'nil') + '\n' +
             'end\n' +
             '})\n' +
             inClassProperties +
-            'if(inst.constructor) then \n' +
-            'inst.constructor(arguments)\n' +
-            'end\n' +
             '__lua_environment.setmetatable(inst, { __index = function(t, key)\n' +
             'if(key=="__type") then\n' +
-            'return "object"\n' +
+            'return String("object")\n' +
+            'end\n' +
+            'if(key=="__javascript_parent") then\n' +
+            'return __javascript_parent\n' +
             'end\n' +
             'if(key=="__javascript_class") then\n' +
             'return ' + ctx.class_name.text + '\n' +
             'end\n' +
-            'if(__javascript_class_properties[key]) then\n' +
+            'if __lua_environment.type(key) == "table" and key.__type == String("string") then\n' +
+            'return __javascript_class_properties[key.__value]\n' +
+            'elseif(__javascript_class_properties[key]) then\n' +
             'return __javascript_class_properties[key]\n' +
-            'elseif(' + ctx.class_name.text + '.__javascript_parent_class) then\n' +
-            'return ' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key)\n' +
+            'elseif(' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key)) then\n' +
+            'return function(arguments) return ' + ctx.class_name.text + '.__javascript_parent_class.__javascript_get_internal_method(key)(inst, arguments) end\n' +
             'else\n' +
             'return nil\n' +
             'end\n' +
             'end\n' +
             '})\n' +
             inheritProperties +
-            'return inst\n' +
+            '\nif(inst.constructor) then \n' +
+            'inst.constructor(arguments)\n' +
+            'end\n' +
+            '\nreturn inst\n' +
             'end\n'
 
         this.classStack.pop()
@@ -608,12 +616,12 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super_Constructor.
     visitSingle_Expression_Super_Constructor(ctx) {
-        return '__javascript_parent_class.constructor( this, ' + this.visit(ctx.super_arguments) + ')'
+        return 'this.__javascript_parent.constructor( ' + this.visit(ctx.constructor_args) + ')'
     }
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super.
     visitSingle_Expression_Super(ctx) {
-        return '__javascript_parent'
+        return 'this.__javascript_parent'
     }
 
 

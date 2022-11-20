@@ -16,19 +16,19 @@ function Number.__convert_to_number(value)
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
             return 0
-        elseif value.__type == 'null' then
+        elseif value.__type == String('null') then
             value = 0
-        elseif value.__type == 'boolean' then
+        elseif value.__type == String('boolean') then
             if value.__value == true then
                 value = 1
             else
                 value = 0
             end
-        elseif value.__type == 'number' then
+        elseif value.__type == String('number') then
             return value.__value
-        elseif value.__type == 'string' then
+        elseif value.__type == String('string') then
             return (__lua_environment.tonumber(value.__value) or 0)
-        elseif value.__type == 'object' then
+        elseif value.__type == String('object') then
             if value.valueOf then
                 return value.valueOf()
             elseif value.toString() then
@@ -81,7 +81,7 @@ function Number:__init(value)
             if key == '__value' then
                 return __lua_environment.rawget(inst, '__value')
             elseif key == '__type' then
-                return 'number'
+                return String('number')
             elseif Number[key] then
                 return function(arguments)
                     return Number[key](inst, arguments)

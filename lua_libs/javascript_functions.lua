@@ -52,16 +52,10 @@ function javascript.__javascript_add(expr1, expr2)
     if (__lua_environment.type(expr1) == 'string' and __lua_environment.type(expr2) == 'string') then
         return expr1 .. expr2
     end
-    if (javascript.__javascript_instanceof(expr1) == 'string' and javascript.__javascript_instanceof(expr2) == 'string') then
+    if (javascript.__javascript_instanceof(expr1).__value == 'string' and javascript.__javascript_instanceof(expr2).__value == 'string') then
         return expr1 + expr2
     end
     return Number(javascript.__javascript_toNumeric(expr1).__value + javascript.__javascript_toNumeric(expr2).__value)
-end
-
-function javascript.__add_to_global_table(t)
-    for key, val in __lua_environment.pairs(t) do
-        _G[key] = val
-    end
 end
 
 function javascript.__javascript_toNumeric(val)
@@ -74,7 +68,7 @@ end
 
 function javascript.__javascript_type(val)
     if __lua_environment.type(val) == "table" then
-        return val.__type or __lua_environment.type(val)
+        return val.__type or String(__lua_environment.type(val))
     end
     return __lua_environment.type(val)
 end
@@ -83,15 +77,15 @@ function javascript.__javascript_instanceof(val, class)
     local inst_class = val.__javascript_class
     while (inst_class ~= nil) do
         if inst_class == class then
-            return true
+            return Boolean(true)
         end
         inst_class = inst_class.__javascript_parent_class
     end
-    return false
+    return Boolean(false)
 end
 
-function javascript.__javascript_hasProperty(val, prop)
-    return val[prop] ~= nil
+function javascript.__javascript_hasProperty(prop, object)
+    return Boolean(object[prop] ~= nil)
 end
 
 function javascript.__javascript_logical_or(expr1, expr2)

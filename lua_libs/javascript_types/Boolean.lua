@@ -18,17 +18,17 @@ function Boolean.__convert_to_boolean(value)
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
             return true -- A regular lua table, should return true.
-        elseif value.__type == 'null' then
+        elseif value.__type == String('null') then
             return false
-        elseif value.__type == 'boolean' then
+        elseif value.__type == String('boolean') then
             return value.__value
-        elseif value.__type == 'string' then
+        elseif value.__type == String('string') then
             if #value.__value == 0 then
                 return false
             else
                 return true
             end
-        elseif value.__type == 'object' then
+        elseif value.__type == String('object') then
             return true
         end
     end
@@ -65,7 +65,7 @@ function Boolean:__init(value)
             if key == '__value' then
                 return __lua_environment.rawget(inst, '__value')
             elseif key == '__type' then
-                return 'boolean'
+                return String('boolean')
             elseif Boolean[key] then
                 return function(arguments)
                     return Boolean[key](inst, arguments)
