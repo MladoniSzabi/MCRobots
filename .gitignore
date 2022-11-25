@@ -3,3 +3,4 @@ transpiler/antlr*.jar
 transpiler/.antlr
 grun
 node_modules
+out/

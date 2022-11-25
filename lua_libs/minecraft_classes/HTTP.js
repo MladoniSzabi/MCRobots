@@ -81,7 +81,8 @@ class WebSocket {
         let message, isBinary = this.lua_socket.receive(timeout || timeout.__value)
         if(message) {
             return {
-                message, isBinary
+                message: message,
+                isBinary: isBinary
             }
         }
         return {message: null, isBinary: false}
@@ -96,7 +97,7 @@ class WebSocket {
     }
 }
 
-export class HTTP {
+class HTTP {
     static request(url, body = undefined, headers = undefined, binary = undefined, method = undefined, redirect = undefined) {
         let obj = {
             url: url.__value,
@@ -124,7 +125,7 @@ export class HTTP {
         if(response == undefined) {
             return {
                 error: errorMsg,
-                errorResponse
+                errorResponse: errorResponse
             }
         }
         return Response(response)
@@ -144,7 +145,7 @@ export class HTTP {
         if(response == undefined) {
             return {
                 error: errorMsg,
-                errorResponse
+                errorResponse: errorResponse
             }
         }
         return Response(response)
@@ -172,3 +173,5 @@ export class HTTP {
         __lua_environment.http.websocketAsync(url.__value, headers)
     }
 }
+
+export default HTTP

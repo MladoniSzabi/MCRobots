@@ -122,14 +122,15 @@ singleExpression:
 		Single_Expression_Assignment
 	| <assoc = right> exp1 = singleExpression operator = assignmentOperator exp2 = singleExpression #
 		Single_Expression_Assignment_Operator
-	| Import '(' exp = singleExpression ')'	# Single_Expression_Import
-	| Super constructor_args = arguments	# Single_Expression_Super_Constructor
-	| Super									# Single_Expression_Super
-	| VariableName							# Single_Expression_Variable
-	| literal								# Single_Expression_Literal
-	| arrayLiteral							# Single_Expression_Array_Literal
-	| objectLiteral							# Single_Expression_Object_Literal
-	| '(' expr = expressionSequence ')'		# Single_Expression_Parenthesis;
+	| Import '(' exp = singleExpression ')'		# Single_Expression_Import
+	| Export 'default' exp = singleExpression	# Single_Expression_Export
+	| Super constructor_args = arguments		# Single_Expression_Super_Constructor
+	| Super										# Single_Expression_Super
+	| VariableName								# Single_Expression_Variable
+	| literal									# Single_Expression_Literal
+	| arrayLiteral								# Single_Expression_Array_Literal
+	| objectLiteral								# Single_Expression_Object_Literal
+	| '(' expr = expressionSequence ')'			# Single_Expression_Parenthesis;
 
 expressionSequence:
 	singleExpression (',' singleExpression)* # Expression_Sequence;
@@ -213,6 +214,7 @@ Return: 'return';
 Break: 'break';
 Continue: 'continue';
 Import: 'import';
+Export: 'export';
 Super: 'super';
 In: 'in';
 Instanceof: 'instanceof';

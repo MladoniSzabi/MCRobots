@@ -1,4 +1,4 @@
-export class Turtle {
+class Turtle {
 
     static craft(limit=64) {
         let success, err = __lua_environment.turtle.craft(limit.__value)
@@ -209,3 +209,5 @@ export class Turtle {
     }
 
 }
+
+export default Turtle

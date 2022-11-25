@@ -4,6 +4,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     classStack = []
     loopStack = []
+    exports = []
     isTranspilingTests = false
     fileName = ""
 
@@ -612,6 +613,11 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Import.
     visitSingle_Expression_Import(ctx) {
         return '__javascript_import(' + this.visit(ctx.exp) + ')'
+    }
+
+    // Visit a parse tree produced by JavascriptParser#Single_Expression_Export.
+    visitSingle_Expression_Export(ctx) {
+        return 'return ' + this.visit(ctx.exp)
     }
 
     // Visit a parse tree produced by JavascriptParser#Single_Expression_Super_Constructor.

@@ -1,4 +1,4 @@
-export class Vector {
+class Vector {
     constructor(x = 0, y = 0, z = 0) {
         this.x = x
         this.y = y
@@ -51,6 +51,8 @@ export class Vector {
     }
 
     __toLuaVector() {
-        return __lua_environment.vector.new(this.x.__value, this.y.__value, this.z.__value)
+        return __lua_environment.vector['new'](this.x.__value, this.y.__value, this.z.__value)
     }
 }
+
+export default Vector

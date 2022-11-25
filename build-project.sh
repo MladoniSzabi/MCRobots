@@ -1,0 +1,22 @@
+mkdir out
+
+JS_FILES='lua_libs/minecraft_classes/* '
+LUA_FILES='lua_libs/javascript_types/*'
+
+cp lua_libs/javascript_functions.lua out
+mkdir out/minecraft_classes
+mkdir out/javascript_types
+
+for f in $JS_FILES
+do
+    echo "Processing $f file..."
+    FILE_NAME=${f##*/}
+    node index.js $f > out/minecraft_classes/${FILE_NAME%.*}.lua
+done
+
+for f in $LUA_FILES
+do
+    cp $f out/javascript_types/
+done
+
+#rm -r out
