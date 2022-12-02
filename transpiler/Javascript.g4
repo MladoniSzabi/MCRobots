@@ -41,7 +41,7 @@ iterationStatement:
 continueStatement: Continue;
 breakStatement: Break;
 returnStatement:
-	Return expression = expressionSequence # Return_Statement;
+	Return expression = expressionSequence? # Return_Statement;
 
 functionDeclaration:
 	Function_ function_name = VariableName '(' args = formalParameterList? ')' body = functionBody #
@@ -64,7 +64,7 @@ classDeclaration:
 	)? '{' class_content = classElementList '}' # Class_Declaration;
 classElementList: classElement* # Class_Element_List;
 classElement:
-	isStatic = Static? method = methodDefinition							# Class_Element_Method_Definition
+	is_static = Static? method = methodDefinition							# Class_Element_Method_Definition
 	| emptyStatement														# Class_Element_Empty_Statement
 	| property_name = propertyName '=' property_value = singleExpression	#
 		Class_Element_Property_Definition;
@@ -82,8 +82,9 @@ singleExpression:
 		Single_Expression_Instantiate_With_Args
 	| New class_name = singleExpression # Single_Expression_Instantiate
 	// | anonymousFunction
-	| 'assert' function_arguments = arguments										# Single_Expression_Assert
-	| function_name = singleExpression function_arguments = arguments				# Single_Expression_Call
+	| 'assert' function_arguments = arguments													# Single_Expression_Assert
+	| function_name = singleExpression no_table = '$notable'? function_arguments = arguments	#
+		Single_Expression_Call
 	| Delete expression = singleExpression											# Single_Expression_Delete
 	| Typeof expression = singleExpression											# Single_Expression_Typeof
 	| expression = singleExpression '++'											# Single_Expression_Post_Increment
@@ -175,12 +176,20 @@ variableDeclarationList:
 variableDeclaration:
 	variable_name = VariableName (
 		'=' variable_value = singleExpression
-	)? # Variable_Declaration;
+	)?																					# Variable_Declaration
+	| '(' variable_names = variablesToExpand ')' '=' variable_value = singleExpression	#
+		Variable_Declaration_Expand;
+
+variablesToExpand:
+	variable_name = VariableName (
+		',' other_variable_name = VariableName
+	)* # Variables_To_Expand;
 
 variableModifier: Let | Const | Var # Variable_Modifier;
 
 literal:
 	NullLiteral			# Literal_Null
+	| UndefinedLiteral	# Literal_Undefined
 	| BooleanLiteral	# Literal_Boolean
 	| StringLiteral		# Literal_String
 	| numericLiteral	# Literal_Numberic;
@@ -200,6 +209,7 @@ SingleLineComment:
 WhiteSapce: [\n ] -> skip;
 SemiColon: ';';
 Ellipsis: '...';
+UndefinedLiteral: 'undefined';
 Static: 'static';
 Class: 'class';
 Extends: 'extends';

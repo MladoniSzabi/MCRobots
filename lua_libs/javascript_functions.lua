@@ -2,10 +2,11 @@ local javascript = {}
 
 function javascript.__prepare_environment()
     local global_table = {}
+    global_table.require = require
     for key, value in pairs(_G) do
         if key ~= '_G' then
             global_table[key] = value
-            _G[key] = nil
+            --_G[key] = nil
         end
     end
 
@@ -15,11 +16,11 @@ function javascript.__prepare_environment()
         _G[key] = value
     end
 
-    _G.Number = __lua_environment.require('lua_libs.javascript_types.Number')
-    _G.Boolean = __lua_environment.require('lua_libs.javascript_types.Boolean')
-    _G.String = __lua_environment.require('lua_libs.javascript_types.String')
-    _G.Object = __lua_environment.require('lua_libs.javascript_types.Object')
-    _G.Array = __lua_environment.require('lua_libs.javascript_types.Array')
+    _G.Number = __lua_environment.require('javascript_types.Number')
+    _G.Boolean = __lua_environment.require('javascript_types.Boolean')
+    _G.String = __lua_environment.require('javascript_types.String')
+    _G.Object = __lua_environment.require('javascript_types.Object')
+    _G.Array = __lua_environment.require('javascript_types.Array')
 
 end
 
@@ -110,7 +111,7 @@ javascript.console = {}
 
 function javascript.console.log(arguments)
     -- global tostring is used by print function so need to set it here
-    _G.tostring = __lua_environment.tostring
+    --_G.tostring = __lua_environment.tostring
     for i = 1, #arguments do
         if __lua_environment.type(arguments[i]) == 'table' and arguments[i].toString then
             __lua_environment.print(arguments[i].toString())
@@ -122,7 +123,7 @@ function javascript.console.log(arguments)
         __lua_environment.print()
     end
     -- delete tostring from global since it is not part of javascript
-    _G.tostring = nil
+    --_G.tostring = nil
 end
 
 return javascript

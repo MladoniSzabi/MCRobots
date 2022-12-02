@@ -51,7 +51,7 @@ class Vector {
     }
 
     __toLuaVector() {
-        return __lua_environment.vector['new'](this.x.__value, this.y.__value, this.z.__value)
+        return __lua_environment.vector['new']$notable(this.x.__value, this.y.__value, this.z.__value)
     }
 }
 
