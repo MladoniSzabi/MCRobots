@@ -1,11 +1,50 @@
 local Array = {}
 
+local array_metatable = {
+    __index = function(t, key)
+        if key == '__value' then
+            return __lua_environment.rawget(t, '__value')
+        elseif key == '__type' then
+            return String('object')
+        elseif key == 'length' then
+            return Number(#(__lua_environment.rawget(t, '__value')))
+        elseif __lua_environment.type(key) == 'number' then
+            return (__lua_environment.rawget(t, '__value'))[key+1]
+        elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
+            return (__lua_environment.rawget(t, '__value'))[key.__value+1]
+        elseif Array[key] then
+            return function(arguments)
+                return Array[key](t, arguments)
+            end
+        end
+    end,
+
+    __add = function(op1, op2)
+        return String(String(op1) + String(op2))
+    end,
+
+    __eq = function(op1, op2)
+        if __lua_environment.type(op1) == 'table' and __lua_environment.type(op2) == 'table' and op1.__value and op2.__value then
+            return Boolean(op1.__value == op2.__value)
+        end
+        return false
+    end,
+
+    __lt = function(op1, op2)
+        return __javascript_not_implemented()
+    end,
+
+    __le = function(op1, op2)
+        return __javascript_not_implemented()
+    end
+}
+
 function Array.__convert_to_array(value)
     if value.__javascript_class == 'Array' then
         return value.__value
     end
 
-    if #value == 1 then
+    if __lua_environment.type(value) == 'table' and #value == 1 then
         return {value}
     end
     
@@ -142,44 +181,7 @@ end
 function Array:__init(value)
     local inst = {}
     inst.__value = Array.__convert_to_array(value)
-    __lua_environment.setmetatable(inst, {
-        __index = function(t, key)
-            if key == '__value' then
-                return __lua_environment.rawget(inst, '__value')
-            elseif key == '__type' then
-                return String('object')
-            elseif key == 'length' then
-                return Number(#(__lua_environment.rawget(inst, '__value')))
-            elseif __lua_environment.type(key) == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key+1]
-            elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key.__value+1]
-            elseif Array[key] then
-                return function(arguments)
-                    return Array[key](inst, arguments)
-                end
-            end
-        end,
-
-        __add = function(op1, op2)
-            return String(String(op1) + String(op2))
-        end,
-
-        __eq = function(op1, op2)
-            if __lua_environment.type(op1) == 'table' and __lua_environment.type(op2) == 'table' and op1.__value and op2.__value then
-                return Boolean(op1.__value == op2.__value)
-            end
-            return false
-        end,
-
-        __lt = function(op1, op2)
-            return __javascript_not_implemented()
-        end,
-
-        __le = function(op1, op2)
-            return __javascript_not_implemented()
-        end
-    })
+    __lua_environment.setmetatable(inst, array_metatable)
 
     return inst
 end

@@ -1,6 +1,47 @@
 local String = {}
 
+local string_metatable = {
+    __index = function(t, key)
+        if key == '__value' then
+            return __lua_environment.rawget(t, '__value')
+        elseif key == '__type' then
+            return String('string')
+        elseif key == 'length' then
+            return #(__lua_environment.rawget(t, '__value'))
+        elseif __lua_environment.type(key) == 'number' then
+            return (__lua_environment.rawget(t, '__value'))[key+1]
+        elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
+            return (__lua_environment.rawget(t, '__value'))[key.__value+1]
+        elseif String[key] then
+            return function(arguments)
+                return String[key](t, arguments)
+            end
+        end
+    end,
+
+    __add = function(op1, op2)
+        return String(String.__convert_to_string(op1) .. String.__convert_to_string(op2))
+    end,
+
+    __eq = function(op1, op2)
+        return String.__convert_to_string(op1) == String.__convert_to_string(op2)
+    end,
+
+    __lt = function(op1, op2)
+        return String.__convert_to_string(op1) < String.__convert_to_string(op2)
+    end,
+
+    __le = function(op1, op2)
+        return String.__convert_to_string(op1) <= String.__convert_to_string(op2)
+    end
+}
+
 function String.__convert_to_string(value)
+
+    if __lua_environment.type(value) == 'table' and #value == 1 then
+        value = value[1]
+    end
+
     if __lua_environment.type(value) == 'nil' then
         return 'undefined'
     elseif __lua_environment.type(value) == 'boolean' then
@@ -12,6 +53,9 @@ function String.__convert_to_string(value)
     elseif __lua_environment.type(value) == 'number' then
         return __lua_environment.tostring(value)
     elseif __lua_environment.type(value) == 'string' then
+        if #value == 1 then
+            console.log({value})
+        end
         return value
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
@@ -34,7 +78,11 @@ function String.__convert_to_string(value)
                 return value.toString()
             end
             return "[object Object]"
+        else
+            console.log({"Cannot convert to string as JS type unknown", value.__type})
         end
+    else
+        console.log({"Cannot convert to string as Lua type unknown", __lua_environment.type(value)})
     end
 end
 
@@ -202,42 +250,7 @@ function String:__init(value)
     local inst = {}
     inst.__value = String.__convert_to_string(value)
 
-    __lua_environment.setmetatable(inst, {
-        __index = function(t, key)
-            if key == '__value' then
-                --print({__lua_environment.rawget(inst, '__value')})
-                return __lua_environment.rawget(inst, '__value')
-            elseif key == '__type' then
-                return String('string')
-            elseif key == 'length' then
-                return #(__lua_environment.rawget(inst, '__value'))
-            elseif __lua_environment.type(key) == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key+1]
-            elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
-                return (__lua_environment.rawget(inst, '__value'))[key.__value+1]
-            elseif String[key] then
-                return function(arguments)
-                    return String[key](inst, arguments)
-                end
-            end
-        end,
-
-        __add = function(op1, op2)
-            return String(String.__convert_to_string(op1) .. String.__convert_to_string(op2))
-        end,
-
-        __eq = function(op1, op2)
-            return String.__convert_to_string(op1) == String.__convert_to_string(op2)
-        end,
-
-        __lt = function(op1, op2)
-            return String.__convert_to_string(op1) < String.__convert_to_string(op2)
-        end,
-
-        __le = function(op1, op2)
-            return String.__convert_to_string(op1) <= String.__convert_to_string(op2)
-        end
-    })
+    __lua_environment.setmetatable(inst, string_metatable)
 
     return inst
 end

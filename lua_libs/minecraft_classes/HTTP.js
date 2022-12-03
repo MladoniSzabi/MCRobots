@@ -62,11 +62,11 @@ class Response {
         if(curr_offset == undefined) {
             return {
                 offset: -1,
-                error: err
+                error: String(err)
             }
         }
         return {
-            offset: curr_offset,
+            offset: Number(curr_offset),
             error: ''
         }
     }
@@ -78,11 +78,11 @@ class WebSocket {
     }
 
     receive(timeout = undefined) {
-        let (message, isBinary) = this.lua_socket.receive$notable(timeout || timeout.__value)
+        let (message, isBinary) = this.lua_socket.receive$notable(timeout && timeout.__value)
         if(message) {
             return {
-                message: message,
-                isBinary: isBinary
+                message: String(message),
+                isBinary: Boolean(isBinary)
             }
         }
         return {message: null, isBinary: false}

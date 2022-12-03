@@ -1,6 +1,93 @@
 local Number = {}
 
+local number_metatable = {
+    __index = function(t, key)
+        if key == '__value' then
+            return __lua_environment.rawget(t, '__value')
+        elseif key == '__type' then
+            return String('number')
+        elseif Number[key] then
+            return function(arguments)
+                return Number[key](t, arguments)
+            end
+        end
+    end,
+
+    __add = function(op1, op2)
+        return Number(Number(op1).__value + Number(op2).__value)
+    end,
+
+    __sub = function(op1, op2)
+        return Number(Number(op1).__value - Number(op2).__value)
+    end,
+
+    __mul = function(op1, op2)
+        return Number(Number(op1).__value * Number(op2).__value)
+    end,
+
+    __div = function(op1, op2)
+        return Number(Number(op1).__value / Number(op2).__value)
+    end,
+
+    __mod = function(op1, op2)
+        return Number(Number(op1).__value % Number(op2).__value)
+    end,
+
+    __pow = function(op1, op2)
+        return Number(Number(op1).__value ^ Number(op2).__value)
+    end,
+
+    -- __idiv = function(op1, op2)
+    --     return Number(Number(op1).__value // Number(op2).__value)
+    -- end,
+
+    -- __band = function(op1, op2)
+    --     return Number(Number(op1).__value & Number(op2).__value)
+    -- end,
+    
+    -- __bor = function(op1, op2)
+    --     return Number(Number(op1).__value | Number(op2).__value)
+    -- end,
+
+    -- __bxor = function(op1, op2)
+    --     return Number(Number(op1).__value ~ Number(op2).__value)
+    -- end,
+    
+    -- __bnot = function(op1)
+    --     return Number(~Number(op1).__value)
+    -- end,
+    
+    -- __shl = function(op1, op2)
+    --     return Number(Number(op1).__value << Number(op2).__value)
+    -- end,
+    
+    -- __shr = function(op1, op2)
+    --     return Number(Number(op1).__value >> Number(op2).__value)
+    -- end,
+
+    __unm = function(op1)
+        return Number(-(Number(op1).__value))
+    end,
+
+    __eq = function(op1, op2)
+        return Number(op1).__value == Number(op2).__value
+    end,
+
+    __lt = function(op1, op2)
+        return Number(op1).__value < Number(op2).__value
+    end,
+
+    __le = function(op1, op2)
+        return Number(op1).__value <= Number(op2).__value
+    end
+}
+
 function Number.__convert_to_number(value)
+
+    if __lua_environment.type(value) == 'table' and #value == 1 then
+        value = value[1]
+    end
+
     if __lua_environment.type(value) == 'nil' then
         return 0
     elseif __lua_environment.type(value) == 'number' then
@@ -14,21 +101,21 @@ function Number.__convert_to_number(value)
     elseif __lua_environment.type(value) == 'string' then
         return (__lua_environment.tonumber(value) or 0)
     elseif __lua_environment.type(value) == 'table' then
-        if value.__type == nil then
+        if value.__type.__value == nil then
             return 0
-        elseif value.__type == String('null') then
+        elseif value.__type.__value == 'null' then
             value = 0
-        elseif value.__type == String('boolean') then
+        elseif value.__type.__value == 'boolean' then
             if value.__value == true then
                 value = 1
             else
                 value = 0
             end
-        elseif value.__type == String('number') then
+        elseif value.__type.__value == 'number' then
             return value.__value
-        elseif value.__type == String('string') then
+        elseif value.__type.__value == 'string' then
             return (__lua_environment.tonumber(value.__value) or 0)
-        elseif value.__type == String('object') then
+        elseif value.__type.__value == 'object' then
             if value.valueOf then
                 return value.valueOf()
             elseif value.toString() then
@@ -76,87 +163,7 @@ end
 function Number:__init(value)
     local inst = {}
     inst.__value = Number.__convert_to_number(value)
-    __lua_environment.setmetatable(inst, {
-        __index = function(t, key)
-            if key == '__value' then
-                return __lua_environment.rawget(inst, '__value')
-            elseif key == '__type' then
-                return String('number')
-            elseif Number[key] then
-                return function(arguments)
-                    return Number[key](inst, arguments)
-                end
-            end
-        end,
-
-        __add = function(op1, op2)
-            return Number(Number(op1).__value + Number(op2).__value)
-        end,
-
-        __sub = function(op1, op2)
-            return Number(Number(op1).__value - Number(op2).__value)
-        end,
-
-        __mul = function(op1, op2)
-            return Number(Number(op1).__value * Number(op2).__value)
-        end,
-
-        __div = function(op1, op2)
-            return Number(Number(op1).__value / Number(op2).__value)
-        end,
-
-        __mod = function(op1, op2)
-            return Number(Number(op1).__value % Number(op2).__value)
-        end,
-
-        __pow = function(op1, op2)
-            return Number(Number(op1).__value ^ Number(op2).__value)
-        end,
-
-        -- __idiv = function(op1, op2)
-        --     return Number(Number(op1).__value // Number(op2).__value)
-        -- end,
-
-        -- __band = function(op1, op2)
-        --     return Number(Number(op1).__value & Number(op2).__value)
-        -- end,
-        
-        -- __bor = function(op1, op2)
-        --     return Number(Number(op1).__value | Number(op2).__value)
-        -- end,
-
-        -- __bxor = function(op1, op2)
-        --     return Number(Number(op1).__value ~ Number(op2).__value)
-        -- end,
-        
-        -- __bnot = function(op1)
-        --     return Number(~Number(op1).__value)
-        -- end,
-        
-        -- __shl = function(op1, op2)
-        --     return Number(Number(op1).__value << Number(op2).__value)
-        -- end,
-        
-        -- __shr = function(op1, op2)
-        --     return Number(Number(op1).__value >> Number(op2).__value)
-        -- end,
-
-        __unm = function(op1)
-            return Number(-(Number(op1).__value))
-        end,
-
-        __eq = function(op1, op2)
-            return Number(op1).__value == Number(op2).__value
-        end,
-
-        __lt = function(op1, op2)
-            return Number(op1).__value < Number(op2).__value
-        end,
-
-        __le = function(op1, op2)
-            return Number(op1).__value <= Number(op2).__value
-        end
-    })
+    __lua_environment.setmetatable(inst, number_metatable)
     return inst
 end
 

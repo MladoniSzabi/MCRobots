@@ -1,6 +1,37 @@
 local Object = {}
 
+local object_metatable = {
+    __index = function(t, key)
+        if key == '__value' then
+            return __lua_environment.rawget(t, '__value')
+        elseif key == '__type' then
+            return String('object')
+        elseif __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key) then
+            return __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key)
+        elseif __lua_environment.type(key) == 'table' and key.__type == 'string' and __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key.__value) then
+            return __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key.__value)
+        elseif Object[key] then
+            return function(arguments)
+                return Object[key](t, arguments)
+            end
+        end
+    end,
+
+    __newindex = function(t, key, value)
+        if __lua_environment.type(key) == 'string' then
+            __lua_environment.rawset(__lua_environment.rawget(t, '__value'), key, value)
+        elseif __lua_environment.type(key) == 'table' and key.__type == 'string' then
+            __lua_environment.rawset(__lua_environment.rawget(t, '__value'), key.__value, value)
+        end
+    end
+}
+
 function Object.__convert_to_object(value)
+
+    if __lua_environment.type(value) == 'table' and #value == 1 then
+        value = value[1]
+    end
+
     if __lua_environment.type(value) == 'nil' then
         return {}
     elseif __lua_environment.type(value) == 'boolean' then
@@ -61,31 +92,7 @@ function Object:__init(value)
         return internal_value
     end
     
-    __lua_environment.setmetatable(inst, {
-        __index = function(t, key)
-            if key == '__value' then
-                return __lua_environment.rawget(inst, '__value')
-            elseif key == '__type' then
-                return String('object')
-            elseif __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key) then
-                return __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key)
-            elseif __lua_environment.type(key) == 'table' and key.__type == 'string' and __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key.__value) then
-                return __lua_environment.rawget(__lua_environment.rawget(inst, '__value'), key.__value)
-            elseif Object[key] then
-                return function(arguments)
-                    return Object[key](inst, arguments)
-                end
-            end
-        end,
-
-        __newindex = function(t, key, value)
-            if __lua_environment.type(key) == 'string' then
-                __lua_environment.rawset(__lua_environment.rawget(inst, '__value'), key, value)
-            elseif __lua_environment.type(key) == 'table' and key.__type == 'string' then
-                __lua_environment.rawset(__lua_environment.rawget(inst, '__value'), key.__value, value)
-            end
-        end
-    })
+    __lua_environment.setmetatable(inst, object_metatable)
     return inst
 end
 

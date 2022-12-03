@@ -100,7 +100,7 @@ function javascript.__javascript_logical_and(expr1, expr2)
     if not Boolean(expr1).__value then
         return expr1
     end
-    return Boolean(expr2)
+    return expr2
 end
 
 function javascript.__javascript_import(file)
