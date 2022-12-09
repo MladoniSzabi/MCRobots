@@ -89,7 +89,15 @@ class WebSocket {
     }
 
     send(message, binary = false) {
-        this.lua_socket.send$notable(message.__value, binary.__value)
+        if(message instanceof Array) {
+            let encodedMessage = ""
+            for(let el of message) {
+                encodedMessage += String(__lua_environment.string.char$notable(el.__value))
+            }
+            this.lua_socket.send$notable(encodedMessage.__value, binary.__value)
+        } else {
+            this.lua_socket.send$notable(message.__value, binary.__value)
+        }
     }
 
     close() {
