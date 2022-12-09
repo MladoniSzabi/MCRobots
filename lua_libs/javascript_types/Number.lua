@@ -2,10 +2,15 @@ local Number = {}
 
 local number_metatable = {
     __index = function(t, key)
+        if __lua_environment.type(key) == 'table' and key.__value then
+            key = key.__value
+        end
         if key == '__value' then
             return __lua_environment.rawget(t, '__value')
         elseif key == '__type' then
             return String('number')
+        elseif key == '__javascript_class' then
+            return Number
         elseif Number[key] then
             return function(arguments)
                 return Number[key](t, arguments)

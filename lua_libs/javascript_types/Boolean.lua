@@ -2,10 +2,15 @@ local Boolean = {}
 
 local boolean_metatable = {
     __index = function(t, key)
+        if __lua_environment.type(key) == 'table' and key.__value then
+            key = key.__value
+        end
         if key == '__value' then
             return __lua_environment.rawget(t, '__value')
         elseif key == '__type' then
             return String('boolean')
+        elseif key == '__javascript_class' then
+            return Boolean
         elseif Boolean[key] then
             return function(arguments)
                 return Boolean[key](t, arguments)

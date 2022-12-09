@@ -2,16 +2,19 @@ local Array = {}
 
 local array_metatable = {
     __index = function(t, key)
+        if __lua_environment.type(key) == 'table' and key.__value then
+            key = key.__value
+        end
         if key == '__value' then
             return __lua_environment.rawget(t, '__value')
         elseif key == '__type' then
             return String('object')
+        elseif key == '__javascript_class' then
+            return Array
         elseif key == 'length' then
             return Number(#(__lua_environment.rawget(t, '__value')))
         elseif __lua_environment.type(key) == 'number' then
             return (__lua_environment.rawget(t, '__value'))[key+1]
-        elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
-            return (__lua_environment.rawget(t, '__value'))[key.__value+1]
         elseif Array[key] then
             return function(arguments)
                 return Array[key](t, arguments)
@@ -40,7 +43,7 @@ local array_metatable = {
 }
 
 function Array.__convert_to_array(value)
-    if value.__javascript_class == 'Array' then
+    if __lua_environment.type(value) == 'table' and value.__javascript_class == 'Array' then
         return value.__value
     end
 
@@ -166,7 +169,15 @@ function Array.toLocaleUpperCase(this, arguments)
     return __javascript_not_implemented()
 end
 function Array.toString(this, arguments)
-    return __javascript_not_implemented()
+    local retval = '['
+    for i = 1,#this.__value do
+        if i == 1 then
+            retval = retval + String(this[i])
+        else
+            retval = retval + ', ' + String(this[i])
+        end
+    end
+    return retval + ']'
 end
 function Array.unshift(this, arguments)
     return __javascript_not_implemented()

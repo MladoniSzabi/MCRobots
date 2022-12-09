@@ -2,14 +2,17 @@ local Object = {}
 
 local object_metatable = {
     __index = function(t, key)
+        if __lua_environment.type(key) == 'table' and key.__value then
+            key = key.__value
+        end
         if key == '__value' then
             return __lua_environment.rawget(t, '__value')
         elseif key == '__type' then
             return String('object')
+        elseif key == '__javascript_class' then
+            return Object
         elseif __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key) then
             return __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key)
-        elseif __lua_environment.type(key) == 'table' and key.__type == 'string' and __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key.__value) then
-            return __lua_environment.rawget(__lua_environment.rawget(t, '__value'), key.__value)
         elseif Object[key] then
             return function(arguments)
                 return Object[key](t, arguments)
@@ -42,7 +45,15 @@ function Object.__convert_to_object(value)
         return String(value)
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
-            return value
+            if #value ~= 0 then
+                return Array(value)
+            end
+
+            local obj = {}
+            for key, val in __lua_environment.pairs(value) do
+                obj[key] = __lua_type_to_javascript(val)
+            end
+            return obj
         elseif value.__type == String('null') then
             return {}
         elseif value.__type == String('boolean') then

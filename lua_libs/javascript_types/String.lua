@@ -2,16 +2,19 @@ local String = {}
 
 local string_metatable = {
     __index = function(t, key)
+        if __lua_environment.type(key) == 'table' and key.__value then
+            key = key.__value
+        end
         if key == '__value' then
             return __lua_environment.rawget(t, '__value')
         elseif key == '__type' then
             return String('string')
+        elseif key == '__javascript_class' then
+            return String
         elseif key == 'length' then
             return #(__lua_environment.rawget(t, '__value'))
         elseif __lua_environment.type(key) == 'number' then
             return (__lua_environment.rawget(t, '__value'))[key+1]
-        elseif __lua_environment.type(key) == 'table' and key.__type == 'number' then
-            return (__lua_environment.rawget(t, '__value'))[key.__value+1]
         elseif String[key] then
             return function(arguments)
                 return String[key](t, arguments)
@@ -53,9 +56,6 @@ function String.__convert_to_string(value)
     elseif __lua_environment.type(value) == 'number' then
         return __lua_environment.tostring(value)
     elseif __lua_environment.type(value) == 'string' then
-        if #value == 1 then
-            console.log({value})
-        end
         return value
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
@@ -86,50 +86,64 @@ function String.__convert_to_string(value)
     end
 end
 
-function String.anchor(this, arguments)
-    return __javascript_not_implemented()
-end
 function String.at(this, arguments)
-    return __javascript_not_implemented()
-end
-function String.big(this, arguments)
-    return __javascript_not_implemented()
-end
-function String.blink(this, arguments)
-    return __javascript_not_implemented()
-end
-function String.bold(this, arguments)
-    return __javascript_not_implemented()
+    local index = Number(arguments[1]).__value
+    if index < 0 then
+        index = #this.__value + index
+    end
+
+    if index >= #this.__value then
+        return nil
+    end
+
+    return String(this.__value[index+1])
 end
 function String.charAt(this, arguments)
-    return __javascript_not_implemented()
+    local index = Number(arguments[1]).__value
+    if index < 0 then
+        index = #this.__value + index
+    end
+
+    if index >= #this.__value then
+        return String("")
+    end
+
+    return String(this.__value[index+1])
 end
 function String.charCodeAt(this, arguments)
-    return __javascript_not_implemented()
+    local index = Number(arguments[1]).__value
+    if index < 0 then
+        index = #this.__value + index
+    end
+
+    if index >= #this.__value then
+        return Number(0) -- TODO: This should be NaN
+    end
+
+    return Number(__lua_environment.string.byte(this.__value[index+1]))
 end
 function String.codePointAt(this, arguments)
     return __javascript_not_implemented()
 end
 function String.concat(this, arguments)
-    return __javascript_not_implemented()
+    local retval = this.__value
+    for i=1,#arguments do
+        retval = retval .. String(arguments[i]).__value
+    end
+    return retval
 end
 function String.constructor(this, arguments)
-    return __javascript_not_implemented()
+    return String(arguments)
 end
 function String.endsWith(this, arguments)
-    return __javascript_not_implemented()
-end
-function String.fixed(this, arguments)
-    return __javascript_not_implemented()
-end
-function String.fontcolor(this, arguments)
-    return __javascript_not_implemented()
-end
-function String.fontsize(this, arguments)
-    return __javascript_not_implemented()
+    local str = this.__value
+    local _end = String(arguments[1]).__value
+    return Boolean(__lua_environment.string.find(str, _end, #str - #_end))
 end
 function String.hasOwnProperty(this, arguments)
-    return __javascript_not_implemented()
+    local arg = String(arguments[1]).__value
+    if arg == 'length' then return Boolean(true) end
+    return Boolean(false)
 end
 function String.includes(this, arguments)
     return __javascript_not_implemented()
@@ -183,13 +197,48 @@ function String.search(this, arguments)
     return __javascript_not_implemented()
 end
 function String.slice(this, arguments)
-    return __javascript_not_implemented()
+    local indexStart = Number(arguments[1])
+    local indexEnd = Number(arguments[2] or #this.__value-1)
+
+    indexStart = indexStart.__value
+    indexEnd = indexEnd.__value
+
+    if indexStart >= #this.__value then
+        return ""
+    end
+
+    if indexEnd >= #this.__value then
+        indexEnd = #this.__value-1
+    end
+
+    if indexStart < 0 then
+        indexStart = Math.max(indexStart + #this.__value, 0).__value
+    end
+
+    if indexEnd < 0 then
+        indexEnd = Math.max(indexEnd + #this.__value, 0).__value
+    end
+
+    if indexEnd <= indexStart then
+        return ""
+    end
+
+    return __lua_environment.string.sub(this.__value, indexStart + 1, indexEnd + 1 )
 end
 function String.small(this, arguments)
     return __javascript_not_implemented()
 end
 function String.split(this, arguments)
-    return __javascript_not_implemented()
+    local s = arguments[1]
+    if __lua_environment.type(s) == 'table' and s.__type == 'string' then
+        s = s.__value
+    end
+    local delimiter = arguments[2]
+    local result = Array();
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        result.push(match);
+    end
+    return result;
 end
 function String.startsWith(this, arguments)
     return __javascript_not_implemented()

@@ -1,5 +1,25 @@
 local javascript = {}
 
+function javascript.__lua_type_to_javascript(value)
+    if __lua_environment.type(value) == 'nil' then
+        return {}
+    elseif __lua_environment.type(value) == 'boolean' then
+        return Boolean(false)
+    elseif __lua_environment.type(value) == 'number' then
+        return Number(value)
+    elseif __lua_environment.type(value) == 'string' then
+        return String(value)
+    elseif __lua_environment.type(value) == 'table' then
+        if value.__type ~= nil then
+            return value
+        elseif #value ~= 0 then
+            return Array(value)
+        else
+            return Object(value)
+        end
+    end
+end
+
 function javascript.__prepare_environment()
     local global_table = {}
     global_table.require = require
@@ -53,7 +73,7 @@ function javascript.__javascript_add(expr1, expr2)
     if (__lua_environment.type(expr1) == 'string' and __lua_environment.type(expr2) == 'string') then
         return expr1 .. expr2
     end
-    if (javascript.__javascript_instanceof(expr1).__value == 'string' and javascript.__javascript_instanceof(expr2).__value == 'string') then
+    if (javascript.__javascript_instanceof(expr1, String) and javascript.__javascript_instanceof(expr2, String)) then
         return expr1 + expr2
     end
     return Number(javascript.__javascript_toNumeric(expr1).__value + javascript.__javascript_toNumeric(expr2).__value)
