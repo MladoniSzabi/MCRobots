@@ -12,6 +12,7 @@ mkdir out/javascript_types
 for f in $JS_FILES
 do
     FILE_NAME=${f##*/}
+    echo "Building file $f"
     node index.js $f > out/minecraft_classes/${FILE_NAME%.*}.lua
 done
 

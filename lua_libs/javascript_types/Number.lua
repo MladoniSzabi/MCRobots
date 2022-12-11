@@ -106,7 +106,7 @@ function Number.__convert_to_number(value)
     elseif __lua_environment.type(value) == 'string' then
         return (__lua_environment.tonumber(value) or 0)
     elseif __lua_environment.type(value) == 'table' then
-        if value.__type.__value == nil then
+        if value.__type == nil then
             return 0
         elseif value.__type.__value == 'null' then
             value = 0

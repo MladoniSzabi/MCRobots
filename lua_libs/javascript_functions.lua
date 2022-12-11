@@ -14,6 +14,8 @@ function javascript.__lua_type_to_javascript(value)
             return value
         elseif #value ~= 0 then
             return Array(value)
+        elseif value.__internal_methods then
+            return value
         else
             return Object(value)
         end
@@ -95,6 +97,9 @@ function javascript.__javascript_type(val)
 end
 
 function javascript.__javascript_instanceof(val, class)
+    if not val then
+        return false
+    end
     local inst_class = val.__javascript_class
     while (inst_class ~= nil) do
         if inst_class == class then
@@ -127,6 +132,16 @@ function javascript.__javascript_import(file)
     return __lua_environment.require(file)
 end
 
+function javascript.__javascript_splice(args, index)
+    local pos, new = 1, {}
+    
+    for i = index, #args do
+        new[pos] = args[i]
+        pos = pos + 1
+    end
+    return Array(new)
+end
+
 javascript.console = {}
 
 function javascript.console.log(arguments)
@@ -134,7 +149,12 @@ function javascript.console.log(arguments)
     --_G.tostring = __lua_environment.tostring
     for i = 1, #arguments do
         if __lua_environment.type(arguments[i]) == 'table' and arguments[i].toString then
-            __lua_environment.print(arguments[i].toString())
+            local toPrint = arguments[i].toString()
+            if toPrint.__value then
+                __lua_environment.print(toPrint.__value)
+            else
+                __lua_environment.print(toPrint)
+            end
         else
             __lua_environment.print(arguments[i])
         end

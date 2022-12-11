@@ -51,7 +51,11 @@ function Array.__convert_to_array(value)
         return {value}
     end
     
-    return value
+    if __lua_environment.type(value) == 'table' then
+        return value
+    end
+    
+    return {value}
 end
 
 
@@ -107,7 +111,20 @@ function Array.includes(this, arguments)
     return __javascript_not_implemented()
 end
 function Array.indexOf(this, arguments)
-    return __javascript_not_implemented()
+    local value = arguments[1]
+    if not value then
+        return Number(-1)
+    end
+
+    if value.__value then
+        value = value.__value
+    end
+    for i, v in __lua_environment.ipairs(this.__value) do
+        if v == value then
+            return Number(i-1)
+        end
+    end
+    return Number(-1)
 end
 function Array.isPrototypeOf(this, arguments)
     return __javascript_not_implemented()
@@ -172,12 +189,12 @@ function Array.toString(this, arguments)
     local retval = '['
     for i = 1,#this.__value do
         if i == 1 then
-            retval = retval + String(this[i])
+            retval = retval .. String(this[i]).__value
         else
-            retval = retval + ', ' + String(this[i])
+            retval = retval .. ', ' .. String(this[i]).__value
         end
     end
-    return retval + ']'
+    return retval .. ']'
 end
 function Array.unshift(this, arguments)
     return __javascript_not_implemented()

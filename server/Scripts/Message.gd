@@ -29,6 +29,9 @@ static func encode(command, params):
 		return PoolByteArray()
 
 static func decode(message):
+	if message.get_string_from_utf8() == "init":
+		return { "type": "init" }
+	
 	var encoded_blocks = message.get_string_from_utf8().split(" ")
 	var blocks = []
 	for i in range(encoded_blocks.size()):
@@ -38,4 +41,5 @@ static func decode(message):
 			blocks.append(BLOCK_NAME_TO_ID[encoded_blocks[i]])
 		else:
 			blocks.append(BLOCK_NAME_TO_ID["unknown_block"])
-	return blocks
+	print(blocks)
+	return { "type": "surrounding", "blocks": blocks }

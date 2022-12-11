@@ -1,4 +1,5 @@
 class Vector {
+
     constructor(x = 0, y = 0, z = 0) {
         this.x = x
         this.y = y
@@ -22,7 +23,7 @@ class Vector {
     }
 
     dot(other) {
-        return this.x * other.x + this.y * other.y + this.z * other.z 
+        return this.x * other.x + this.y * other.y + this.z * other.z
     }
 
     cross(other) {
@@ -34,7 +35,7 @@ class Vector {
     }
 
     length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z *this.z)
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z)
     }
 
     normalize() {
@@ -55,4 +56,21 @@ class Vector {
     }
 }
 
-export default Vector
+const ORIENTATION_NORTH = new Vector(1, 0, 0)
+const ORIENTATION_SOUTH = new Vector(-1, 0, 0)
+const ORIENTATION_WEST = new Vector(0, 0, -1)
+const ORIENTATION_EAST = new Vector(0, 0, 1)
+const ORIENTATION_UP = new Vector(0, 1, 0)
+const ORIENTATION_DOWN = new Vector(0, -1, 0)
+const ORIENTATIONS = [ORIENTATION_NORTH, ORIENTATION_EAST, ORIENTATION_SOUTH, ORIENTATION_WEST]
+
+export default {
+    Vector: Vector,
+    ORIENTATION_NORTH: ORIENTATION_NORTH,
+    ORIENTATION_SOUTH: ORIENTATION_SOUTH,
+    ORIENTATION_WEST: ORIENTATION_WEST,
+    ORIENTATION_EAST: ORIENTATION_EAST,
+    ORIENTATION_UP: ORIENTATION_UP,
+    ORIENTATION_DOWN: ORIENTATION_DOWN,
+    ORIENTATIONS: ORIENTATIONS
+}

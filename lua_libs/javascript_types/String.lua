@@ -14,7 +14,8 @@ local string_metatable = {
         elseif key == 'length' then
             return #(__lua_environment.rawget(t, '__value'))
         elseif __lua_environment.type(key) == 'number' then
-            return (__lua_environment.rawget(t, '__value'))[key+1]
+            local val = __lua_environment.rawget(t, '__value')
+            return String(__lua_environment.string.sub(val, key+1, key+1))
         elseif String[key] then
             return function(arguments)
                 return String[key](t, arguments)
@@ -71,6 +72,8 @@ function String.__convert_to_string(value)
             else
                 return 'false'
             end
+        elseif value.__type.__value == 'number' then
+            return __lua_environment.tostring(value.__value)
         elseif value.__type.__value == 'string' then
             return value.__value
         elseif value.__type.__value == 'object' then
@@ -229,15 +232,17 @@ function String.small(this, arguments)
     return __javascript_not_implemented()
 end
 function String.split(this, arguments)
-    local s = arguments[1]
-    if __lua_environment.type(s) == 'table' and s.__type == 'string' then
-        s = s.__value
+    local delimiter = arguments[1]
+    if __lua_environment.type(delimiter) == 'table' and delimiter.__type.__value == 'string' then
+        delimiter = delimiter.__value
     end
-    local delimiter = arguments[2]
     local result = Array();
-    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-        result.push(match);
-    end
+    
+    local pattern = __lua_environment.string.format("([^%s]+)", delimiter)
+    __lua_environment.string.gsub(this.__value, pattern, function(c)
+        result.push({String(c)})
+    end)
+    
     return result;
 end
 function String.startsWith(this, arguments)

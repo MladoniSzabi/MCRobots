@@ -187,21 +187,21 @@ class Turtle {
         let (success, info) = __lua_environment.turtle.inspect$notable()
         if(success)
             return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
-        return null
+        return false
     }
 
     static inspectUp() {
         let (success, info) = __lua_environment.turtle.inspectUp$notable()
         if(success)
             return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
-        return null
+        return false
     }
 
     static inspectDown() {
         let (success, info) = __lua_environment.turtle.inspectDown$notable()
         if(success)
             return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
-        return null
+        return false
     }
 
     static getItemDetail(slot, detailed = false) {

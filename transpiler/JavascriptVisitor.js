@@ -157,7 +157,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
                 propertyImplementations += ctx.class_name.text + '.__internal_methods.' + property.name + ' = function(this, __javascript_arguments)\n' +
                     property.arguments.map(
                         (x, i) => x.isRestParameter
-                            ? ('local ' + x.name + ' = javascript_splice(__javascript_arguments, ' + (i + 1) + ')')
+                            ? ('local ' + x.name + ' = __javascript_splice(__javascript_arguments, ' + (i + 1) + ')')
                             : ('local ' + x.name + ' = __javascript_arguments[' + (i + 1).toString() + ']' + ' or ' + x.default_value + '\n'))
                         .join('') + '\n' +
                     property.body +
