@@ -166,4 +166,8 @@ function javascript.console.log(arguments)
     --_G.tostring = nil
 end
 
+javascript.console.warn = javascript.console.log
+javascript.console.error = javascript.console.log
+
+
 return javascript
