@@ -16,16 +16,6 @@ class SpatialData {
             this.orientation = spatial_data.orientation
         }
     }
-
-    turn_left() {
-        let index = VectorImport.ORIENTATIONS.indexOf(this.orientation)
-        this.orientation = VectorImport.ORIENTATIONS[(index + 1) % VectorImport.ORIENTATIONS.length]
-    }
-
-    turn_right() {
-        let index = VectorImport.ORIENTATIONS.indexOf(this.orientation)
-        this.orientation = VectorImport.ORIENTATIONS[(index - 1) % VectorImport.ORIENTATIONS.length]
-    }
 }
 
 class Robot {

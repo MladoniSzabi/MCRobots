@@ -56,21 +56,57 @@ class Vector {
     }
 }
 
-const ORIENTATION_NORTH = new Vector(1, 0, 0)
-const ORIENTATION_SOUTH = new Vector(-1, 0, 0)
-const ORIENTATION_WEST = new Vector(0, 0, -1)
-const ORIENTATION_EAST = new Vector(0, 0, 1)
-const ORIENTATION_UP = new Vector(0, 1, 0)
-const ORIENTATION_DOWN = new Vector(0, -1, 0)
-const ORIENTATIONS = [ORIENTATION_NORTH, ORIENTATION_EAST, ORIENTATION_SOUTH, ORIENTATION_WEST]
+/*                           north                    east                  south                west         */
+const ORIENTATIONS_XZ = [new Vector(1, 0, 0), new Vector(0, 0, 1), new Vector(-1, 0, 0), new Vector(0, 0, -1)]
+
+class Orientation {
+
+    direction_vector = null
+
+    constructor() {
+        this.direction_vector = new Vector(1, 0, 0)
+    }
+
+    constructor(vector) {
+        this.direction_vector = vector
+    }
+
+    turn_left() {
+        let index = ORIENTATIONS_XZ.indexOf(this.direction_vector)
+        if (index == -1) {
+            return this
+        }
+
+        this.direction_vector = ORIENTATIONS_XZ[(index + 1) % ORIENTATIONS_XZ.length]
+        return this
+    }
+
+    turn_right() {
+        let index = ORIENTATIONS_XZ.indexOf(this.direction_vector)
+        if (index == -1) {
+            return this
+        }
+
+        this.direction_vector = ORIENTATIONS_XZ[(index - 1) % ORIENTATIONS_XZ.length]
+        return this
+    }
+
+}
+
+const ORIENTATION_NORTH = new Orientation(ORIENTATIONS_XZ[0])
+const ORIENTATION_SOUTH = new Orientation(ORIENTATIONS_XZ[2])
+const ORIENTATION_WEST = new Orientation(ORIENTATIONS_XZ[3])
+const ORIENTATION_EAST = new Orientation(ORIENTATIONS_XZ[1])
+const ORIENTATION_UP = new Orientation(new Vector(0, 1, 0))
+const ORIENTATION_DOWN = new Orientation(new Vector(0, -1, 0))
 
 export default {
     Vector: Vector,
+    Orientation: Orientation,
     ORIENTATION_NORTH: ORIENTATION_NORTH,
     ORIENTATION_SOUTH: ORIENTATION_SOUTH,
     ORIENTATION_WEST: ORIENTATION_WEST,
     ORIENTATION_EAST: ORIENTATION_EAST,
     ORIENTATION_UP: ORIENTATION_UP,
     ORIENTATION_DOWN: ORIENTATION_DOWN,
-    ORIENTATIONS: ORIENTATIONS
 }

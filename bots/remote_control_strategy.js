@@ -1,7 +1,7 @@
 const Turtle = import("minecraft_classes.Turtle")
 
 class RemoteControlStrategy {
-    run(command, robot_spatial_data) {
+    run(command) {
         if (command.type == "empty") {
             return true
         }
@@ -13,15 +13,15 @@ class RemoteControlStrategy {
             }
             else if (command.direction == 'left') {
                 Turtle.turnLeft()
-                robot_spatial_data.turn_left()
+                robot_spatial_data.orientation.turn_left()
             }
             else if (command.direction == 'backwards') {
                 Turtle.back()
-                robot_spatial_data.position = robot_spatial_data.position.sub(robot_spatial_data.orientation)
+                robot_spatial_data.orientation.position = robot_spatial_data.position.sub(robot_spatial_data.orientation)
             }
             else if (command.direction == 'right') {
                 Turtle.turnRight()
-                robot_spatial_data.turn_right()
+                robot_spatial_data.orientation.turn_right()
             }
         }
 
