@@ -78,7 +78,10 @@ class WebSocket {
     }
 
     receive(timeout = undefined) {
-        let (message, isBinary) = this.lua_socket.receive$notable(timeout && timeout.__value)
+        if(timeout != undefined) {
+            timeout = timeout.__value
+        }
+        let (message, isBinary) = this.lua_socket.receive$notable(timeout)
         if(message) {
             return {
                 message: String(message),

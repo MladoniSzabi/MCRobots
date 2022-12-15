@@ -123,7 +123,7 @@ function Number.__convert_to_number(value)
         elseif value.__type.__value == 'object' then
             if value.valueOf then
                 return value.valueOf()
-            elseif value.toString() then
+            elseif value.toString then
                 return (__lua_environment.tonumber(value.toString()) or 0)
             else
                 return 0
