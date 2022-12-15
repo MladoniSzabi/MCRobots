@@ -1,33 +1,17 @@
 const HTTP = import("minecraft_classes.HTTP")
 const Turtle = import("minecraft_classes.Turtle")
 const Message = import("message")
-const VectorImport = import("minecraft_classes.Vector")
-const Vector = VectorImport.Vector
 
 const SERVER_ADDRESS = "ws://localhost:9999"
-
-class SpatialData {
-    position = new Vector()
-    orientation = VectorImport.ORIENTATION_NORTH
-
-    constructor(spatial_data = null) {
-        if (spatial_data) {
-            this.position = spatial_data.position
-            this.orientation = spatial_data.orientation
-        }
-    }
-}
 
 class Robot {
 
     socket = null
     strategy = null
-    spatial_data = null
     is_erroring = false
     is_idle = false
 
     constructor() {
-        this.spatial_data = new SpatialData()
         this.socket = HTTP.websocket(SERVER_ADDRESS)
 
         if ("error" in this.socket) {
@@ -48,7 +32,7 @@ class Robot {
         }
 
         let init_command = Message.decode(response.message)
-        this.spatial_data = new SpatialData(init_command.spatial_data)
+        Turtle.set_spatial_data(init_command.spatial_data)
         this.strategy = init_command.strategy
 
     }
@@ -62,7 +46,7 @@ class Robot {
             }
 
             if (this.strategy) {
-                this.is_idle = this.strategy.run(command, this.spatial_data)
+                this.is_idle = this.strategy.run(command)
             }
 
             if (!this.is_idle) {

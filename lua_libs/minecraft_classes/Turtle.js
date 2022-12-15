@@ -1,4 +1,29 @@
+const VectorImport = import("minecraft_classes.Vector")
+const Vector = VectorImport.Vector
+
+class SpatialData {
+    position = new Vector()
+    orientation = VectorImport.ORIENTATION_NORTH
+
+    constructor(spatial_data = null) {
+        if (spatial_data) {
+            this.position = spatial_data.position
+            this.orientation = spatial_data.orientation
+        }
+    }
+}
+
+let spatial_data = new SpatialData()
+
 class Turtle {
+
+    static set_spatial_data(new_spatial_data) {
+        spatial_data = new_spatial_data
+    }
+
+    static get_spatial_data() {
+        return spatial_data
+    }
 
     static craft(limit=64) {
         let (success, err) = __lua_environment.turtle.craft$notable(limit.__value)
@@ -7,31 +32,61 @@ class Turtle {
 
     static forward() {
         let (success, err) = __lua_environment.turtle.forward$notable()
+
+        if(success) {
+            spatial_data.position += spatial_data.orientation
+        }
+
         return success ? '' : String(err)
     }
 
     static back() {
         let (success, err) = __lua_environment.turtle.back$notable()
+
+        if(success) {
+            spatial_data.position -= spatial_data.orientation
+        }
+
         return success ? '' : String(err)
     }
 
     static up() {
         let (success, err) = __lua_environment.turtle.up$notable()
+
+        if(success) {
+            spatial_data.position += VectorImport.ORIENTATION_UP
+        }
+
         return success ? '' : String(err)
     }
 
     static down() {
         let (success, err) = __lua_environment.turtle.down$notable()
+
+        if(success) {
+            spatial_data.position += VectorImport.ORIENTATION_DOWN
+        }
+
         return success ? '' : String(err)
     }
 
     static turnLeft() {
         let (success, err) = __lua_environment.turtle.turnLeft$notable()
+
+        if(success) {
+            spatial_data.orientation.turn_left()
+        }
+
         return success ? '' : String(err)
     }
 
     static turnRight() {
         let (success, err) = __lua_environment.turtle.turnRight$notable()
+
+        if(success) {
+            spatial_data.orientation.turn_right()
+        }
+
         return success ? '' : String(err)
     }
 
