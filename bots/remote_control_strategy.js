@@ -3,7 +3,7 @@ const Turtle = import("minecraft_classes.Turtle")
 class RemoteControlStrategy {
     run(command, robot_spatial_data) {
         if (command.type == "empty") {
-            return false
+            return true
         }
 
         if (command.type == "movement") {
@@ -25,7 +25,7 @@ class RemoteControlStrategy {
             }
         }
 
-        return true
+        return false
     }
 }
 

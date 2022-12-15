@@ -34,6 +34,7 @@ class Robot {
     strategy = null
     spatial_data = null
     is_erroring = false
+    is_idle = false
 
     constructor() {
         this.spatial_data = new SpatialData()
@@ -64,20 +65,19 @@ class Robot {
 
     run() {
         while (!this.is_erroring) {
-            let response = this.socket.receive(2)
+            let response = this.socket.receive(this.is_idle ? 3 : 0)
             let command = Message.decode(response.message)
             if (command.type == "change_strategy") {
                 this.strategy = command.new_strategy
             }
 
             if (this.strategy) {
-                if (this.strategy.run(command, this.spatial_data)) {
-                    this.send_blocks()
-                }
+                this.is_idle = this.strategy.run(command, this.spatial_data)
             }
 
-            console.log(this.spatial_data.position)
-            console.log(this.spatial_data.orientation)
+            if (!this.is_idle) {
+                this.send_blocks()
+            }
         }
 
         this.socket.close()
