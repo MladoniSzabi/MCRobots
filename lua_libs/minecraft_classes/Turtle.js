@@ -34,7 +34,7 @@ class Turtle {
         let (success, err) = __lua_environment.turtle.forward$notable()
 
         if(success) {
-            spatial_data.position.add(spatial_data.orientation)
+            spatial_data.position = spatial_data.position.add(spatial_data.orientation.direction_vector)
         }
 
         return success ? '' : String(err)
@@ -44,7 +44,7 @@ class Turtle {
         let (success, err) = __lua_environment.turtle.back$notable()
 
         if(success) {
-            spatial_data.position.sub(spatial_data.orientation)
+            spatial_data.position = spatial_data.position.sub(spatial_data.orientation.direction_vector)
         }
 
         return success ? '' : String(err)
@@ -54,7 +54,7 @@ class Turtle {
         let (success, err) = __lua_environment.turtle.up$notable()
 
         if(success) {
-            spatial_data.position.add(VectorImport.ORIENTATION_UP)
+            spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)
         }
 
         return success ? '' : String(err)
@@ -64,7 +64,7 @@ class Turtle {
         let (success, err) = __lua_environment.turtle.down$notable()
 
         if(success) {
-            spatial_data.position.add(VectorImport.ORIENTATION_DOWN)
+            spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)
         }
 
         return success ? '' : String(err)
@@ -74,7 +74,7 @@ class Turtle {
         let (success, err) = __lua_environment.turtle.turnLeft$notable()
 
         if(success) {
-            spatial_data.orientation.turn_left()
+            spatial_data.orientation = spatial_data.orientation.turn_left()
         }
 
         return success ? '' : String(err)
@@ -84,7 +84,7 @@ class Turtle {
         let (success, err) = __lua_environment.turtle.turnRight$notable()
 
         if(success) {
-            spatial_data.orientation.turn_right()
+            spatial_data.orientation = spatial_data.orientation.turn_right()
         }
 
         return success ? '' : String(err)

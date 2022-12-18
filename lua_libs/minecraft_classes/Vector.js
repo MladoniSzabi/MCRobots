@@ -63,12 +63,12 @@ class Orientation {
 
     direction_vector = null
 
-    constructor() {
-        this.direction_vector = new Vector(1, 0, 0)
-    }
-
     constructor(vector) {
-        this.direction_vector = vector
+        if(vector) {
+            this.direction_vector = vector
+        } else {
+            this.direction_vector = new Vector(1,0,0)
+        }
     }
 
     turn_left() {
@@ -77,8 +77,7 @@ class Orientation {
             return this
         }
 
-        this.direction_vector = ORIENTATIONS_XZ[(index + 1) % ORIENTATIONS_XZ.length]
-        return this
+        return new Orientation(ORIENTATIONS_XZ[(index + 1) % ORIENTATIONS_XZ.length])
     }
 
     turn_right() {
@@ -87,8 +86,16 @@ class Orientation {
             return this
         }
 
-        this.direction_vector = ORIENTATIONS_XZ[(index - 1) % ORIENTATIONS_XZ.length]
-        return this
+        return new Orientation(ORIENTATIONS_XZ[(index - 1) % ORIENTATIONS_XZ.length])
+    }
+
+    equals(other_orientation) {
+        // Check if they both point to the same vector first since its quicker
+        if(this.direction_vector == other_orientation.direction_vector) {
+            return true
+        }
+
+        return this.direction_vector.equals(other_orientation.direction_vector)
     }
 
 }

@@ -61,7 +61,7 @@ function String.__convert_to_string(value)
     elseif __lua_environment.type(value) == 'table' then
         if value.__type == nil then
             if value.toString then
-                return value.toString()
+                return value.toString().__value
             end
             return "[object Object]"
         elseif value.__type.__value == 'null' then
@@ -78,7 +78,7 @@ function String.__convert_to_string(value)
             return value.__value
         elseif value.__type.__value == 'object' then
             if value.toString then
-                return value.toString()
+                return value.toString().__value
             end
             return "[object Object]"
         else
@@ -207,7 +207,7 @@ function String.slice(this, arguments)
     indexEnd = indexEnd.__value
 
     if indexStart >= #this.__value then
-        return ""
+        return String("")
     end
 
     if indexEnd >= #this.__value then
@@ -223,10 +223,10 @@ function String.slice(this, arguments)
     end
 
     if indexEnd <= indexStart then
-        return ""
+        return String("")
     end
 
-    return __lua_environment.string.sub(this.__value, indexStart + 1, indexEnd + 1 )
+    return String(__lua_environment.string.sub(this.__value, indexStart + 1, indexEnd + 1 ))
 end
 function String.small(this, arguments)
     return __javascript_not_implemented()

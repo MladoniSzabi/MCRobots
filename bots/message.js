@@ -1,21 +1,47 @@
 const RemoteControlStrategy = import("remote_control_strategy")
 const VectorImport = import("minecraft_classes.Vector")
+const Turtle = import("minecraft_classes.Turtle")
 const Vector = VectorImport.Vector
 
 class Message {
 
+    static orientation_to_string(orientation) {
+        if(orientation.equals(VectorImport.ORIENTATION_NORTH))
+            return "north"
+        if(orientation.equals(VectorImport.ORIENTATION_SOUTH))
+            return "south"
+        if(orientation.equals(VectorImport.ORIENTATION_WEST))
+            return "west"
+        if(orientation.equals(VectorImport.ORIENTATION_EAST))
+            return "east"
+        return ""
+    }
+
+    static string_to_orientation(orientation_string) {
+        if(orientation_string == "north")
+            return VectorImport.ORIENTATION_NORTH
+        if(orientation_string == "south")
+            return VectorImport.ORIENTATION_SOUTH
+        if(orientation_string == "west")
+            return VectorImport.ORIENTATION_WEST
+        if(orientation_string == "east")
+            return VectorImport.ORIENTATION_EAST
+        return new VectorImport.Orientation(new Vector(0,0,0))
+    }
+
     static encode_surrounding(surrounding) {
-        let message = ""
+        
+        let message = Turtle.get_spatial_data().position.toString() + ", " + Message.orientation_to_string(Turtle.get_spatial_data().orientation) + ", "
         if (surrounding[0]) {
-            message += surrounding[0]["name"] + " "
+            message += surrounding[0]["name"] + ", "
         } else {
-            message += "none "
+            message += "none, "
         }
 
         if (surrounding[1]) {
-            message += surrounding[1]["name"] + " "
+            message += surrounding[1]["name"] + ", "
         } else {
-            message += "none "
+            message += "none, "
         }
 
         if (surrounding[2]) {
@@ -36,15 +62,7 @@ class Message {
     static decode_init_command(message) {
         let tokens = message.split(" ")
         let position = new Vector(Number(tokens[1]), Number(tokens[2]), Number(tokens[3]))
-        let orientation
-        if(tokens[4] == "north")
-            orientation = VectorImport.ORIENTATION_NORTH
-        if(tokens[4] == "south")
-            orientation = VectorImport.ORIENTATION_SOUTH
-        if(tokens[4] == "west")
-            orientation = VectorImport.ORIENTATION_WEST
-        if(tokens[4] == "east")
-            orientation = VectorImport.ORIENTATION_EAST
+        let orientation = Message.string_to_orientation(tokens[4])
         
         let strategy = null
         if(tokens[5] == "rc") {

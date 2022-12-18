@@ -189,9 +189,9 @@ function Array.toString(this, arguments)
     local retval = '['
     for i = 1,#this.__value do
         if i == 1 then
-            retval = retval .. String(this[i]).__value
+            retval = retval .. String(this.__value[i]).__value
         else
-            retval = retval .. ', ' .. String(this[i]).__value
+            retval = retval .. ', ' .. String(this.__value[i]).__value
         end
     end
     return retval .. ']'
