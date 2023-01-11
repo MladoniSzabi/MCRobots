@@ -21,6 +21,9 @@ local object_metatable = {
     end,
 
     __newindex = function(t, key, value)
+        if __lua_environment.type(key) == 'table' and key.__value then
+            key = key.__value
+        end
         if __lua_environment.type(key) == 'string' then
             __lua_environment.rawset(__lua_environment.rawget(t, '__value'), key, value)
         elseif __lua_environment.type(key) == 'table' and key.__type == 'string' then
