@@ -73,10 +73,9 @@ end
 
 function javascript.__javascript_add(expr1, expr2)
     if (__lua_environment.type(expr1) == 'string' and __lua_environment.type(expr2) == 'string') then
-        return expr1 .. expr2
-    end
-    if (javascript.__javascript_instanceof(expr1, String) and javascript.__javascript_instanceof(expr2, String)) then
-        return expr1 + expr2
+        return String(expr1 .. expr2)
+    elseif ((javascript.__javascript_instanceof(expr1, String).__value) and (javascript.__javascript_instanceof(expr2, String)).__value) then
+        return String(expr1) + String(expr2)
     end
     return Number(javascript.__javascript_toNumeric(expr1).__value + javascript.__javascript_toNumeric(expr2).__value)
 end
@@ -98,7 +97,10 @@ end
 
 function javascript.__javascript_instanceof(val, class)
     if not val then
-        return false
+        return Boolean(false)
+    end
+    if __lua_environment.type(val) ~= "table" or not val.__type then
+        val = javascript.__lua_type_to_javascript(val)
     end
     local inst_class = val.__javascript_class
     while (inst_class ~= nil) do
@@ -133,13 +135,12 @@ function javascript.__javascript_import(file)
 end
 
 function javascript.__javascript_splice(args, index)
-    local pos, new = 1, {}
+    local new = Array({})
     
     for i = index, #args do
-        new[pos] = args[i]
-        pos = pos + 1
+        new.push({args[i]})
     end
-    return Array(new)
+    return new
 end
 
 javascript.console = {}
