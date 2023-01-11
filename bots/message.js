@@ -31,31 +31,28 @@ class Message {
 
     static encode_surrounding(surrounding) {
         
-        let message = Turtle.get_spatial_data().position.toString() + ", " + Message.orientation_to_string(Turtle.get_spatial_data().orientation) + ", "
-        if (surrounding[0]) {
-            message += surrounding[0]["name"] + ", "
-        } else {
-            message += "none, "
-        }
+        let messages = []
+        let message = "position, " + Turtle.get_spatial_data().position.toString() + ", " + Message.orientation_to_string(Turtle.get_spatial_data().orientation)
+        messages.push(message)
 
-        if (surrounding[1]) {
-            message += surrounding[1]["name"] + ", "
-        } else {
-            message += "none, "
-        }
+        for(let coords in surrounding) {
+            console.log("coord", coords)
+            message = "block, " + coords + ", "
 
-        if (surrounding[2]) {
-            message += surrounding[2]["name"]
-        } else {
-            message += "none"
+            console.log(surrounding[coords])
+            if (surrounding[coords]) {
+                message += String(surrounding[coords]["name"]) + ", "
+            } else {
+                message += "none, "
+            }
+            messages.push(message)
         }
-
-        return message
+        return messages
     }
 
     static encode(message_type, ...params) {
         if (message_type == "surrounding") {
-            return Message.encode_surrounding(params)
+            return Message.encode_surrounding(params[0])
         }
     }
 

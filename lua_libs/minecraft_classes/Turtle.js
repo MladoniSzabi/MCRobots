@@ -14,8 +14,48 @@ class SpatialData {
 }
 
 let spatial_data = new SpatialData()
+let blocks = {}
 
 class Turtle {
+
+    static record_surrounding() {
+        let (success, info) = __lua_environment.turtle.inspectUp$notable()
+        console.log()
+        if(success) {
+            blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = info
+        } else {
+            blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = null
+        }
+
+        let (success, info) = __lua_environment.turtle.inspect$notable()
+        if(success) {
+            blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = info
+        } else {
+            blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
+        }
+
+        let (success, info) = __lua_environment.turtle.inspectDown$notable()
+        if(success) {
+            blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = info
+        } else {
+            blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = null
+        }
+    }
+
+    static record_forward() {
+        let (success, info) = __lua_environment.turtle.inspect$notable()
+        if(success) {
+            blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = info
+        } else {
+            blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
+        }
+    }
+
+    static flush_blocks() {
+        retval = blocks
+        blocks = {}
+        return retval
+    }
 
     static set_spatial_data(new_spatial_data) {
         spatial_data = new_spatial_data
@@ -35,6 +75,7 @@ class Turtle {
 
         if(success) {
             spatial_data.position = spatial_data.position.add(spatial_data.orientation.direction_vector)
+            Turtle.record_surrounding()
         }
 
         return success ? '' : String(err)
@@ -45,6 +86,7 @@ class Turtle {
 
         if(success) {
             spatial_data.position = spatial_data.position.sub(spatial_data.orientation.direction_vector)
+            Turtle.record_surrounding()
         }
 
         return success ? '' : String(err)
@@ -55,6 +97,7 @@ class Turtle {
 
         if(success) {
             spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)
+            Turtle.record_surrounding()
         }
 
         return success ? '' : String(err)
@@ -65,6 +108,7 @@ class Turtle {
 
         if(success) {
             spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)
+            Turtle.record_surrounding()
         }
 
         return success ? '' : String(err)
@@ -75,6 +119,7 @@ class Turtle {
 
         if(success) {
             spatial_data.orientation = spatial_data.orientation.turn_left()
+            Turtle.record_forward()
         }
 
         return success ? '' : String(err)
@@ -85,6 +130,7 @@ class Turtle {
 
         if(success) {
             spatial_data.orientation = spatial_data.orientation.turn_right()
+            Turtle.record_forward()
         }
 
         return success ? '' : String(err)

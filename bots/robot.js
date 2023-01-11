@@ -59,8 +59,10 @@ class Robot {
     }
 
     send_blocks() {
-        let message = Message.encode("surrounding", Turtle.inspectUp(), Turtle.inspect(), Turtle.inspectDown())
-        this.socket.send(message)
+        let messages = Message.encode("surrounding", Turtle.flush_blocks())
+        for(let message of messages) {
+            this.socket.send(message)
+        }
     }
 
 }

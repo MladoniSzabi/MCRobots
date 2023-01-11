@@ -42,20 +42,29 @@ static func encode(command, params):
 		print("Command not understood: ", command)
 		return PoolByteArray()
 
+static func decodePositionCommand(command):
+	var position = Vector3(int(command[1]), int(command[2]), int(command[3]))
+	var orientation = stringToOrientation(command[4])
+	return { "type":"position", "position": position, "orientation": orientation }
+
+static func decodeBlockCommand(command):
+	var position = Vector3(int(command[1]), int(command[2]), int(command[3]))
+	var block = BLOCK_NAME_TO_ID["unknown_block"]
+	if command[4] == "none":
+		block = null
+	elif command[4] in BLOCK_NAME_TO_ID:
+		block = BLOCK_NAME_TO_ID[command[4]]
+	return { "type": "block", "position": position, "block": block }
+
 static func decode(message):
 	if message.get_string_from_utf8() == "init":
 		return { "type": "init" }
 	
 	var encoded_data = message.get_string_from_utf8().split(", ")
-	var position = Vector3(int(encoded_data[0]), int(encoded_data[1]), int(encoded_data[2]))
-	var orientation = stringToOrientation(encoded_data[3])
-	var blocks = []
-	for i in range(4, encoded_data.size()):
-		if encoded_data[i] == "none":
-			blocks.append(null)
-		elif encoded_data[i] in BLOCK_NAME_TO_ID:
-			blocks.append(BLOCK_NAME_TO_ID[encoded_data[i]])
-		else:
-			blocks.append(BLOCK_NAME_TO_ID["unknown_block"])
-	print(blocks)
-	return { "type": "surrounding", "position": position, "orientation": orientation, "blocks": blocks }
+	if encoded_data[0] == "position":
+		return decodePositionCommand(encoded_data)
+	elif encoded_data[0] == "block":
+		return decodeBlockCommand(encoded_data)
+	else:
+		print("Unknown command " + encoded_data[0])
+		return {}

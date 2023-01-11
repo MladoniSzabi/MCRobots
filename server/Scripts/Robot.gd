@@ -16,17 +16,6 @@ func _init(var _socket: WebSocketPeer):
 func _ready():
 	pass
 
-func broadcast_surrounding(message):
-	# Tell the world about the blocks we have seen
-	if message.blocks[0]:
-		emit_signal("found_block", message.blocks[0], position + orientation + Orientation.ORIENTATION_UP)
-	
-	if message.blocks[1]:
-		emit_signal("found_block", message.blocks[1], position + orientation)
-	
-	if message.blocks[2]:
-		emit_signal("found_block", message.blocks[2], position + orientation + Orientation.ORIENTATION_DOWN)
-
 func send_init_command(message):
 	# TODO: This is temporary for testing. Fill this in properly.
 	socket.put_packet("i 0 0 0 north rc".to_utf8())
@@ -36,11 +25,13 @@ func receive_message(var payload):
 	var message = Message.decode(payload)
 	if message.type == "init":
 		send_init_command(message)
-	elif message.type == "surrounding":
+	elif message.type == "position":
 		self.position = message.position
 		self.orientation = message.orientation
-		print(self.position, self.orientation)
-		broadcast_surrounding(message)
+	elif message.type == "block":
+		# Tell the world about this block so it can be rendered
+		print("found block", message.block)
+		emit_signal("found_block", message.block, message.position)
 
 func get_socket_id():
 	return socket.get_instance_id()
