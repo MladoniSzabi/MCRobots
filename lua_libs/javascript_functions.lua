@@ -44,6 +44,11 @@ function javascript.__prepare_environment()
     _G.Object = __lua_environment.require('javascript_types.Object')
     _G.Array = __lua_environment.require('javascript_types.Array')
 
+    _G.null = {
+        __type = String('null'),
+        __value = nil
+    }
+
 end
 
 function javascript.__javascript_post_increment(expr)
