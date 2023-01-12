@@ -1,4 +1,5 @@
 const RemoteControlStrategy = import("remote_control_strategy")
+const DiggingStrategy = import("digging_strategy")
 const VectorImport = import("minecraft_classes.Vector")
 const Turtle = import("minecraft_classes.Turtle")
 const Vector = VectorImport.Vector
@@ -64,6 +65,8 @@ class Message {
         let strategy = null
         if(tokens[5] == "rc") {
             strategy = new RemoteControlStrategy()
+        } else if(tokens[5] == "dig") {
+            strategy = new DiggingStrategy()
         }
         
         return {

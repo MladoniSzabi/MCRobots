@@ -138,17 +138,29 @@ class Turtle {
 
     static dig(side = null) {
         let (success, err) = __lua_environment.turtle.dig$notable(side.__value || undefined)
-        return success ? '' : String(err)
+        if(success) {
+            blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
+            return ''
+        }
+        return String(err)
     }
 
     static digUp(side = null) {
         let (success, err) = __lua_environment.turtle.digUp$notable(side.__value || undefined)
-        return success ? '' : String(err)
+        if(success) {
+            blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = null
+            return ''
+        }
+        return String(err)
     }
 
     static digDown(side = null) {
         let (success, err) = __lua_environment.turtle.digDown$notable(side.__value || undefined)
-        return success ? '' : String(err)
+        if(success) {
+            blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = null
+            return ''
+        }
+        return String(err)
     }
 
     static place(text = "") {
@@ -182,6 +194,8 @@ class Turtle {
     }
 
     static select(slot) {
+        // Start indexing from 0
+        slot = slot + 1
         return Boolean(__lua_environment.turtle.select$notable(slot.__value))
     }
 
@@ -252,7 +266,7 @@ class Turtle {
         return __lua_environment.type(fuelLevel) == 'string'.__value ? -1 : Number(fuelLevel)
     }
 
-    static refule(count = 1) {
+    static refuel(count = 1) {
         let (success, err) = __lua_environment.turtle.refuel$notable(count.__value)
         return success ? '' : String(err)
     }
