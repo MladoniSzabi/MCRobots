@@ -52,7 +52,7 @@ class Robot {
             if (!this.is_idle) {
                 this.send_blocks()
             }
-            console.log(Turtle.get_spatial_data().position)
+            //console.log(Turtle.get_spatial_data().position)
         }
 
         this.socket.close()
