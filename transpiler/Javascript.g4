@@ -206,7 +206,7 @@ eos: SemiColon;
 MultiLineComment: '/*' .*? '*/' -> channel(HIDDEN);
 SingleLineComment:
 	'//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
-WhiteSapce: [\n ] -> skip;
+WhiteSpace: [\n ] -> skip;
 SemiColon: ';';
 Ellipsis: '...';
 UndefinedLiteral: 'undefined';
@@ -252,8 +252,9 @@ BinaryIntegerLiteral: '0' [bB] [01] [_01]*;
 
 VariableName: [_a-zA-Z][_a-zA-Z0-9]*;
 
-fragment DoubleStringCharacter: ~["\\\r\n] | '\\"';
-fragment SingleStringCharacter: ~['\\\r\n] | '\\\'';
+fragment DoubleStringCharacter: ~["\\\r\n] | '\\"' | '\\' EscapeSequence;
+fragment SingleStringCharacter: ~['\\\r\n] | '\\\'' | '\\' EscapeSequence;
+fragment EscapeSequence: 'n';
 
 fragment HexDigit: [_0-9a-fA-F];
 fragment DecimalIntegerLiteral: '0' | [1-9] [0-9_]*;
