@@ -1,30 +1,41 @@
 rm -r out
 mkdir out
 
-JS_FILES='lua_libs/minecraft_classes/* '
-LUA_FILES='lua_libs/javascript_types/*'
-ROBOT_FILES='bots/*'
+JS_FILES='lua_libs/minecraft_classes'
+LUA_FILES='lua_libs/javascript_types/'
+ROBOT_FILES='bots'
+
+compile_directory() {
+    mkdir out/${@#*/}
+    js_files=`ls $@`
+    for f in $js_files
+    do
+        FILE_NAME="$@/${f##*/}"
+        compile_path $FILE_NAME
+    done
+}
+
+compile_path() {
+    f=$@
+    if [ -d $f ]; then
+        compile_directory $f
+        return 0
+    fi
+
+    echo "Building file $f"
+    outputFile="out/${f#*/}"
+    outputFile="${outputFile%.*}.lua"
+    node index.js $f > $outputFile
+} 
 
 cp lua_libs/javascript_functions.lua out
-mkdir out/minecraft_classes
 mkdir out/javascript_types
 
-for f in $JS_FILES
-do
-    FILE_NAME=${f##*/}
-    echo "Building file $f"
-    node index.js $f > out/minecraft_classes/${FILE_NAME%.*}.lua
-done
+compile_directory $JS_FILES
 
 for f in $LUA_FILES
 do
-    cp $f out/javascript_types/
+    cp -r $f out/javascript_types/
 done
 
-for f in $ROBOT_FILES
-do
-    FILE_NAME=${f##*/}
-    node index.js $f > out/${FILE_NAME%.*}.lua
-done
-
-#rm -r out
+compile_directory $ROBOT_FILES
