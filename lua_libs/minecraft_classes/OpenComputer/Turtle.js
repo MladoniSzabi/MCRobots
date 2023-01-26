@@ -24,21 +24,21 @@ let blocks = {}
 class OpenComputer {
     static record_surrounding() {
         let retval = Turtle.inspectUp()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = null
         }
 
         retval = Turtle.inspect()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
         }
 
         retval = Turtle.inspectDown()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = null
@@ -47,7 +47,7 @@ class OpenComputer {
 
     static record_forward() {
         retval = Turtle.inspect()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
@@ -68,18 +68,18 @@ class OpenComputer {
         return spatial_data
     }
 
-    static craft(limit=64) {
-        if(crafting) {
-            let (success, err) = crafting.craft$notable(limit.__value)
+    static craft(limit = 64) {
+        if (crafting) {
+            let(success, err) = crafting.craft$notable(limit.__value)
             return success ? '' : 'Could not craft item'
         }
         return 'Crafting upgrade not installed'
     }
 
     static forward() {
-        let (success, err) = robot.forward$notable()
+        let(success, err) = robot.forward$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.add(spatial_data.orientation.direction_vector)
             OpenComputer.record_surrounding()
         }
@@ -88,9 +88,9 @@ class OpenComputer {
     }
 
     static back() {
-        let (success, err) = robot.back$notable()
+        let(success, err) = robot.back$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.sub(spatial_data.orientation.direction_vector)
             OpenComputer.record_surrounding()
         }
@@ -99,9 +99,9 @@ class OpenComputer {
     }
 
     static up() {
-        let (success, err) = robot.up$notable()
+        let(success, err) = robot.up$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)
             OpenComputer.record_surrounding()
         }
@@ -110,9 +110,9 @@ class OpenComputer {
     }
 
     static down() {
-        let (success, err) = robot.down$notable()
+        let(success, err) = robot.down$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)
             OpenComputer.record_surrounding()
         }
@@ -121,9 +121,9 @@ class OpenComputer {
     }
 
     static turnLeft() {
-        let (success, err) = robot.turnLeft$notable()
+        let(success, err) = robot.turnLeft$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.orientation = spatial_data.orientation.turn_left()
             OpenComputer.record_forward()
         }
@@ -132,9 +132,9 @@ class OpenComputer {
     }
 
     static turnRight() {
-        let (success, err) = robot.turnRight$notable()
+        let(success, err) = robot.turnRight$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.orientation = spatial_data.orientation.turn_right()
             OpenComputer.record_forward()
         }
@@ -144,8 +144,8 @@ class OpenComputer {
 
 
     static dig(side = null) {
-        let (success, err) = robot.swing$notable(side.__value || undefined)
-        if(success) {
+        let(success, err) = robot.swing$notable(side.__value || undefined)
+        if (success) {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
             return ''
         }
@@ -153,8 +153,8 @@ class OpenComputer {
     }
 
     static digUp(side = null) {
-        let (success, err) = robot.swingUp$notable(side.__value || undefined)
-        if(success) {
+        let(success, err) = robot.swingUp$notable(side.__value || undefined)
+        if (success) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = null
             return ''
         }
@@ -162,8 +162,8 @@ class OpenComputer {
     }
 
     static digDown(side = null) {
-        let (success, err) = robot.swingDown$notable(side.__value || undefined)
-        if(success) {
+        let(success, err) = robot.swingDown$notable(side.__value || undefined)
+        if (success) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = null
             return ''
         }
@@ -171,32 +171,32 @@ class OpenComputer {
     }
 
     static place(text = "") {
-        let (success, err) = robot.place$notable(text.__value)
+        let(success, err) = robot.place$notable(text.__value)
         return success ? '' : String(err)
     }
 
     static placeUp(text = "") {
-        let (success, err) = robot.placeUp$notable(text.__value)
+        let(success, err) = robot.placeUp$notable(text.__value)
         return success ? '' : String(err)
     }
 
     static placeDown(text = "") {
-        let (success, err) = robot.placeDown$notable(text.__value)
+        let(success, err) = robot.placeDown$notable(text.__value)
         return success ? '' : String(err)
     }
 
     static drop(count = null) {
-        let (success, err) = robot.drop$notable(count.__value || undefined)
+        let(success, err) = robot.drop$notable(count.__value || undefined)
         return success ? '' : String(err)
     }
 
     static dropUp(count = null) {
-        let (success, err) = robot.dropUp$notable(count.__value || undefined)
+        let(success, err) = robot.dropUp$notable(count.__value || undefined)
         return success ? '' : String(err)
     }
 
     static dropDown(count = null) {
-        let (success, err) = robot.dropDown$notable(count.__value || undefined)
+        let(success, err) = robot.dropDown$notable(count.__value || undefined)
         return success ? '' : String(err)
     }
 
@@ -215,17 +215,17 @@ class OpenComputer {
     }
 
     static detect() {
-        let (success, block) = robot.detect$notable()
+        let(success, block) = robot.detect$notable()
         return Boolean(success)
     }
 
     static detectUp() {
-        let (success, block) = robot.detectUp$notable()
+        let(success, block) = robot.detectUp$notable()
         return Boolean(success)
     }
 
     static detectDown() {
-        let (success, block) = robot.detectDown$notable()
+        let(success, block) = robot.detectDown$notable()
         return Boolean(success)
     }
 
@@ -242,32 +242,32 @@ class OpenComputer {
     }
 
     static attack(side = null) {
-        let (success, err) = robot.swing$notable(side.__value || undefined)
+        let(success, err) = robot.swing$notable(side.__value || undefined)
         return success ? '' : String(err)
     }
 
     static attackUp(side = null) {
-        let (success, err) = robot.swingUp$notable(side.__value || undefined)
+        let(success, err) = robot.swingUp$notable(side.__value || undefined)
         return success ? '' : String(err)
     }
 
     static attackDown(side = null) {
-        let (success, err) = robot.swingDown$notable(side.__value || undefined)
+        let(success, err) = robot.swingDown$notable(side.__value || undefined)
         return success ? '' : String(err)
     }
 
     static suck(count = 64) {
-        let (success, err) = robot.suck$notable(count.__value)
+        let(success, err) = robot.suck$notable(count.__value)
         return success ? '' : String(err)
     }
 
     static suckUp(count = 64) {
-        let (success, err) = robot.suckUp$notable(count.__value)
+        let(success, err) = robot.suckUp$notable(count.__value)
         return success ? '' : String(err)
     }
 
     static suckDown(count = 64) {
-        let (success, err) = robot.suckDown$notable(count.__value)
+        let(success, err) = robot.suckDown$notable(count.__value)
         return success ? '' : String(err)
     }
 
@@ -277,8 +277,8 @@ class OpenComputer {
     }
 
     static refuel(count = 1) {
-        if(generator) {
-            let (success, err) = generator.insert$notable(count.__value)
+        if (generator) {
+            let(success, err) = generator.insert$notable(count.__value)
             return success ? '' : String(err)
         }
         return "Generator upgrade not installed"
@@ -302,39 +302,39 @@ class OpenComputer {
     }
 
     static equip() {
-        if(inventory_controller) {
-            let (success, err) = inventory_controller.equip$notable()
+        if (inventory_controller) {
+            let(success, err) = inventory_controller.equip$notable()
             return success ? '' : String(err)
         }
         return "Inventory controller not installer"
     }
 
     static inspect() {
-        let (success, info) = robot.detect$notable()
-        if(success)
-            return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
+        let(success, info) = robot.detect$notable()
+        if (success)
+            return __lua_environment.type(info) == 'string'.__value ? { info: info } : Object(info)
         return false
     }
 
     static inspectUp() {
-        let (success, info) = robot.detectUp$notable()
-        if(success)
-            return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
+        let(success, info) = robot.detectUp$notable()
+        if (success)
+            return __lua_environment.type(info) == 'string'.__value ? { info: info } : Object(info)
         return false
     }
 
     static inspectDown() {
-        let (success, info) = robot.detectDown$notable()
-        if(success)
-            return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
+        let(success, info) = robot.detectDown$notable()
+        if (success)
+            return __lua_environment.type(info) == 'string'.__value ? { info: info } : Object(info)
         return false
     }
 
     static getItemDetail(slot, detailed = false) {
-        if(inventory_controller) {
+        if (inventory_controller) {
             let side = 1
             return Object(inventory_controller.getStackInSlot$notable(side.__value, slot.__value))
         }
-        return {error: "Inventory controller not installer"}
+        return { error: "Inventory controller not installer" }
     }
 }
