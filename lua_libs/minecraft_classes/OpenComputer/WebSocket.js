@@ -7,3 +7,5 @@ class WebSocket {
     send(message, binary = false) { }
     close() { }
 }
+
+export default WebSocket

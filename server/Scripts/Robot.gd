@@ -19,16 +19,19 @@ func _init(var _socket: WebSocketPeer):
 func _ready():
 	pass
 
-func save(folder_name):
+func save(file_name):
 	var file = File.new()
-	file.open(folder_name + "/" + String(id) + ".dat", File.WRITE)
+	file.open(file_name, File.WRITE)
 	file.store_var(position)
 	file.store_var(orientation)
 	file.close()
 
-func load(folder_name):
+func load(file_name):
 	var file = File.new()
-	file.open(folder_name + "/" + String(id) + ".dat", File.READ)
+	if not file.file_exists(file_name):
+		print("Robot save file ", file_name, " does not exist")
+		return
+	file.open(file_name, File.READ)
 	position = file.get_var()
 	orientation = file.store_var()
 	file.close()

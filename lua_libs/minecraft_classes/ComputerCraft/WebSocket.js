@@ -9,7 +9,7 @@ class WebSocket {
     }
 
     connect() {
-        let(websocket, err) = __lua_environment.http.websocket$notable(url.__value, headers)
+        let(websocket, err) = __lua_environment.http.websocket$notable(this.url.__value, this.headers)
         if (websocket) {
             this.socket = websocket
             return {}
@@ -47,3 +47,5 @@ class WebSocket {
         this.socket.close$notable()
     }
 }
+
+export default WebSocket

@@ -33,6 +33,7 @@ func _notification(what):
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
 		SaveManager.save_world($World)
 		for robotid in server.robots:
+			SaveManager.save_robot(server.robots[robotid])
 			server.robots[robotid].save()
 		get_tree().quit()
 
@@ -52,5 +53,5 @@ func on_client_connected(socket_id, robot):
 func on_client_disconnected(socket_id, robot):
 	# Remove the robot from the world
 	$World.set_cell_item(robot.position.x, robot.position.y, robot.position.z, $World.INVALID_CELL_ITEM)
-	robot.save()
+	SaveManager.save_robot(robot)
 	pass

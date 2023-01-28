@@ -41,7 +41,7 @@ const ORIENTATION_TO_STRING = {
 }
 
 static func encode_position(pos):
-	return pos.x + " " + pos.y + " " + pos.z
+	return str(pos.x) + " " + str(pos.y) + " " + str(pos.z)
 
 static func encode_move_command(params):
 	if params == "forward":
@@ -85,7 +85,7 @@ static func decode_block_command(command):
 	return { "type": "block", "position": position, "block": block }
 
 static func decode_init_command(command):
-	return { "type": "init", "id": command[1]}
+	return { "type": "init", "id": int(command[1])}
 
 static func decode(message):
 	var encoded_data = message.get_string_from_utf8().split(", ")

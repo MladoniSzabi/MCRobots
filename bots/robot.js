@@ -1,4 +1,5 @@
-const HTTP = import("minecraft_classes.HTTP")
+
+const WebSocket = import("minecraft_classes.WebSocket")
 const Turtle = import("minecraft_classes.Turtle")
 const Message = import("message")
 
@@ -12,9 +13,10 @@ class Robot {
     is_idle = false
 
     constructor() {
-        this.socket = HTTP.websocket(SERVER_ADDRESS)
+        this.socket = new WebSocket(SERVER_ADDRESS)
+        let retval = this.socket.connect()
 
-        if ("error" in this.socket) {
+        if ("error" in retval) {
             console.error("There was an error connecting to the server", c.error)
             this.is_erroring = true
             return

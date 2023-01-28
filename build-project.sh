@@ -35,7 +35,7 @@ compile_directory $JS_FILES
 
 for f in $LUA_FILES
 do
-    cp -r $f out/javascript_types/
+    cp -r $f out/
 done
 
 compile_directory $ROBOT_FILES
