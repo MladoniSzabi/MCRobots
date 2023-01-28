@@ -48,12 +48,11 @@ func receive_message(var payload):
 			"mode": "rc"
 		}))
 	elif message.type == "position":
-		emit_signal("robot_moved", self.position, message.position)
+		emit_signal("robot_moved", self.position, message.position, message.orientation)
 		self.position = message.position
 		self.orientation = message.orientation
 	elif message.type == "block":
 		# Tell the world about this block so it can be rendered
-		print("found block", message.block)
 		emit_signal("found_block", message.block, message.position)
 
 func get_socket_id():

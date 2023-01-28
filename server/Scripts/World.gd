@@ -1,6 +1,17 @@
 extends GridMap
 
+const Orientation = preload("res://Scripts/Orientation.gd")
+
 const ROBOT_TILE = 15
+
+const ORIENTATION_TO_ORTHOGONAL_INDEX = {
+	Orientation.ORIENTATION_NORTH: 16,
+	Orientation.ORIENTATION_SOUTH: 22,
+	Orientation.ORIENTATION_WEST: 10,
+	Orientation.ORIENTATION_EAST: 0,
+	Orientation.ORIENTATION_UP: 1,
+	Orientation.ORIENTATION_DOWN: 3,
+}
 
 func save(file_name):
 	var file = File.new()

@@ -1,9 +1,9 @@
 extends Node
 
-const ORIENTATION_NORTH = Vector3(1,0,0)
-const ORIENTATION_SOUTH = Vector3(-1,0,0)
-const ORIENTATION_WEST = Vector3(0,0,-1)
-const ORIENTATION_EAST = Vector3(0,0,1)
+const ORIENTATION_NORTH = Vector3(0,0,-1)
+const ORIENTATION_SOUTH = Vector3(0,0,1)
+const ORIENTATION_WEST = Vector3(1,0,0)
+const ORIENTATION_EAST = Vector3(-1,0,0)
 const ORIENTATION_UP = Vector3(0,1,0)
 const ORIENTATION_DOWN = Vector3(0,-1,0)
 

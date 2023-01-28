@@ -41,7 +41,7 @@ const ORIENTATION_TO_STRING = {
 }
 
 static func encode_position(pos):
-	return str(pos.x) + " " + str(pos.y) + " " + str(pos.z)
+	return str(-pos.x) + " " + str(pos.y) + " " + str(pos.z)
 
 static func encode_move_command(params):
 	if params == "forward":
@@ -71,15 +71,16 @@ static func encode(command, params):
 		return PoolByteArray()
 
 static func decode_position_command(command):
-	var position = Vector3(int(command[1]), int(command[2]), int(command[3]))
-	var orientation = STRING_TO_ORIENTATION.get([command[4]], Vector3())
+	var position = Vector3(-int(command[1]), int(command[2]), int(command[3]))
+	var orientation = STRING_TO_ORIENTATION.get(command[4], Vector3())
+	orientation.x *= -1
 	return { "type":"position", "position": position, "orientation": orientation }
 
 static func decode_block_command(command):
-	var position = Vector3(int(command[1]), int(command[2]), int(command[3]))
+	var position = Vector3(-int(command[1]), int(command[2]), int(command[3]))
 	var block = BLOCK_NAME_TO_ID["unknown_block"]
 	if command[4] == "none":
-		block = null
+		block = GridMap.INVALID_CELL_ITEM
 	elif command[4] in BLOCK_NAME_TO_ID:
 		block = BLOCK_NAME_TO_ID[command[4]]
 	return { "type": "block", "position": position, "block": block }

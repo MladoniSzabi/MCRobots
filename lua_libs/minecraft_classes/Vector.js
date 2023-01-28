@@ -57,7 +57,7 @@ class Vector {
 }
 
 /*                           north                    east                  south                west         */
-const ORIENTATIONS_XZ = [new Vector(1, 0, 0), new Vector(0, 0, 1), new Vector(-1, 0, 0), new Vector(0, 0, -1)]
+const ORIENTATIONS_XZ = [new Vector(0, 0, -1), new Vector(1, 0, 0), new Vector(0, 0, 1), new Vector(-1, 0, 0)]
 
 class Orientation {
 
