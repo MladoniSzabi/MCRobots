@@ -52,6 +52,10 @@ class Message {
     }
 
     static encode(message_type, ...params) {
+        if(message_type == "init") {
+            return "init, " + String(params[0])
+        }
+
         if (message_type == "surrounding") {
             return Message.encode_surrounding(params[0])
         }

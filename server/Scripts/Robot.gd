@@ -2,13 +2,16 @@ extends Node
 
 const Message = preload("res://Scripts/Message.gd")
 const Orientation = preload("res://Scripts/Orientation.gd")
+const SaveManager = preload("res://Scripts/SaveManager.gd")
 
+var id = 0
 var position := Vector3()
 var orientation := Orientation.ORIENTATION_NORTH
 
 var socket: WebSocketPeer = null
 
 signal found_block
+signal robot_moved
 
 func _init(var _socket: WebSocketPeer):
 	socket = _socket
@@ -16,16 +19,33 @@ func _init(var _socket: WebSocketPeer):
 func _ready():
 	pass
 
-func send_init_command(message):
-	# TODO: This is temporary for testing. Fill this in properly.
-	socket.put_packet("i 0 0 0 north rc".to_utf8())
+func save(folder_name):
+	var file = File.new()
+	file.open(folder_name + "/" + String(id) + ".dat", File.WRITE)
+	file.store_var(position)
+	file.store_var(orientation)
+	file.close()
+
+func load(folder_name):
+	var file = File.new()
+	file.open(folder_name + "/" + String(id) + ".dat", File.READ)
+	position = file.get_var()
+	orientation = file.store_var()
+	file.close()
 
 func receive_message(var payload):
 	# Decode the message we got over websocket
 	var message = Message.decode(payload)
 	if message.type == "init":
-		send_init_command(message)
+		self.id = message.id
+		SaveManager.load_robot(self)
+		socket.put_packet(Message.encode("init", {
+			"position": position,
+			"orientation": orientation,
+			"mode": "rc"
+		}))
 	elif message.type == "position":
+		emit_signal("robot_moved", self.position, message.position)
 		self.position = message.position
 		self.orientation = message.orientation
 	elif message.type == "block":

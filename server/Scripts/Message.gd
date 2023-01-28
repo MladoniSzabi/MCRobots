@@ -7,25 +7,43 @@ const Orientation = preload("res://Scripts/Orientation.gd")
 # Also helps with satisfying the single responsability principle
 
 const BLOCK_NAME_TO_ID = {
-	"unknown_block": 0,
-	"minecraft:stone": 1,
-	"minecraft:diorite": 2,
-	"minecraft:deepslate": 3,
+	"unknown_block": 14,
+	"minecraft:stone": 0,
+	"minecraft:cobblestone": 1,
+	"minecraft:diorite": 4,
+	"minecraft:andesite": 3,
+	"minecraft:granite": 5,
+	"minecraft:dirt": 16,
+	"minecraft:coal_ore": 2,
+	"minecraft:iron_ore": 8,
+	"minecraft:gold_ore": 9,
+	"minecraft:lapis_ore": 10,
+	"minecraft:redstone_ore": 11,
+	"minecraft:emeral_ore": 7,
+	"minecraft:diamond_ore": 6,
+	"minecraft:oak_log": 17,
+	"minecraft:oak_plank": 18,
+	"minecraft:oak_sapling": 19,
 }
 
-static func stringToOrientation(string):
-	if string == "north":
-		return Orientation.ORIENTATION_NORTH
-	elif string == "south":
-		return Orientation.ORIENTATION_SOUTH
-	elif string == "east":
-		return Orientation.ORIENTATION_EAST
-	elif string == "west":
-		return Orientation.ORIENTATION_WEST
-	
-	return Vector3(0,0,0)
+const STRING_TO_ORIENTATION = {
+	"north": Orientation.ORIENTATION_NORTH,
+	"south": Orientation.ORIENTATION_SOUTH,
+	"east": Orientation.ORIENTATION_EAST,
+	"west": Orientation.ORIENTATION_WEST
+}
 
-static func encodeMoveCommand(params):
+const ORIENTATION_TO_STRING = {
+	Orientation.ORIENTATION_NORTH: "north",
+	Orientation.ORIENTATION_SOUTH: "south",
+	Orientation.ORIENTATION_EAST: "east",
+	Orientation.ORIENTATION_WEST: "west"
+}
+
+static func encode_position(pos):
+	return pos.x + " " + pos.y + " " + pos.z
+
+static func encode_move_command(params):
 	if params == "forward":
 		return "w".to_utf8()
 	elif params == "back":
@@ -35,19 +53,29 @@ static func encodeMoveCommand(params):
 	elif params == "right":
 		return "d".to_utf8()
 
+static func encode_init_command(params):
+	var retval =  "i " + \
+		encode_position(params.position) + " " + \
+		ORIENTATION_TO_STRING[params.orientation] + " "+ \
+		params.mode
+	
+	return retval.to_utf8()
+
 static func encode(command, params):
+	if command == "init":
+		return encode_init_command(params)
 	if command == "move":
-		return encodeMoveCommand(params)
+		return encode_move_command(params)
 	else:
 		print("Command not understood: ", command)
 		return PoolByteArray()
 
-static func decodePositionCommand(command):
+static func decode_position_command(command):
 	var position = Vector3(int(command[1]), int(command[2]), int(command[3]))
-	var orientation = stringToOrientation(command[4])
+	var orientation = STRING_TO_ORIENTATION.get([command[4]], Vector3())
 	return { "type":"position", "position": position, "orientation": orientation }
 
-static func decodeBlockCommand(command):
+static func decode_block_command(command):
 	var position = Vector3(int(command[1]), int(command[2]), int(command[3]))
 	var block = BLOCK_NAME_TO_ID["unknown_block"]
 	if command[4] == "none":
@@ -56,15 +84,17 @@ static func decodeBlockCommand(command):
 		block = BLOCK_NAME_TO_ID[command[4]]
 	return { "type": "block", "position": position, "block": block }
 
+static func decode_init_command(command):
+	return { "type": "init", "id": command[1]}
+
 static func decode(message):
-	if message.get_string_from_utf8() == "init":
-		return { "type": "init" }
-	
 	var encoded_data = message.get_string_from_utf8().split(", ")
-	if encoded_data[0] == "position":
-		return decodePositionCommand(encoded_data)
+	if encoded_data[0] == "init":
+		return decode_init_command(encoded_data)
+	elif encoded_data[0] == "position":
+		return decode_position_command(encoded_data)
 	elif encoded_data[0] == "block":
-		return decodeBlockCommand(encoded_data)
+		return decode_block_command(encoded_data)
 	else:
 		print("Unknown command " + encoded_data[0])
 		return {}

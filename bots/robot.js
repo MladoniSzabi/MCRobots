@@ -24,7 +24,9 @@ class Robot {
     }
 
     initialise() {
-        this.socket.send("init")
+        // Command should be `init {robot_id}` but since we don't have a filesystem API yet and only one robot
+        // hardcode robot ID to 0
+        this.socket.send(Message.encode("init", "0"))
         let response = this.socket.receive(1)
         if (!response.message) {
             console.error("Did not receive an initialisation response")
