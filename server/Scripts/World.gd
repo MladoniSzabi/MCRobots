@@ -1,5 +1,7 @@
 extends GridMap
 
+const ROBOT_TILE = 15
+
 func save(file_name):
 	var file = File.new()
 	if file.open(file_name, File.WRITE) != OK:
