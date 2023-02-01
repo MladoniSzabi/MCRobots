@@ -54,11 +54,11 @@ static func encode_move_command(params):
 		return "d".to_utf8()
 
 static func encode_init_command(params):
+	params.orientation.x *= -1
 	var retval =  "i " + \
 		encode_position(params.position) + " " + \
 		ORIENTATION_TO_STRING[params.orientation] + " "+ \
 		params.mode
-	
 	return retval.to_utf8()
 
 static func encode(command, params):

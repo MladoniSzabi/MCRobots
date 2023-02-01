@@ -33,7 +33,7 @@ func load(file_name):
 		return
 	file.open(file_name, File.READ)
 	position = file.get_var()
-	orientation = file.store_var()
+	orientation = file.get_var()
 	file.close()
 
 func receive_message(var payload):

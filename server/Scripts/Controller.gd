@@ -9,6 +9,7 @@ var selected_robot_socket_id = -1
 
 func _ready():
 	get_tree().set_auto_accept_quit(false)
+	SaveManager.load_world($World)
 	server = Server.new()
 	server.connect("on_client_connected", self, "on_client_connected")
 	server.connect("on_client_disconnected", self, "on_client_disconnected")
@@ -34,7 +35,6 @@ func _notification(what):
 		SaveManager.save_world($World)
 		for robotid in server.robots:
 			SaveManager.save_robot(server.robots[robotid])
-			server.robots[robotid].save()
 		get_tree().quit()
 
 func on_block_received(var block: int, var location: Vector3):
