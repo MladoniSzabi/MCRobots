@@ -28,7 +28,7 @@ func _process(delta):
 	server.poll()
 	if selected_robot_socket_id != -1:
 		move_selected_robot()
-	pass
+		$Camera.follow_robot(server.robots[selected_robot_socket_id], $World)
 
 func _notification(what):
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:

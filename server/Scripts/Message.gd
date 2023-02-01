@@ -54,7 +54,6 @@ static func encode_move_command(params):
 		return "d".to_utf8()
 
 static func encode_init_command(params):
-	params.orientation.x *= -1
 	var retval =  "i " + \
 		encode_position(params.position) + " " + \
 		ORIENTATION_TO_STRING[params.orientation] + " "+ \
@@ -73,7 +72,6 @@ static func encode(command, params):
 static func decode_position_command(command):
 	var position = Vector3(-int(command[1]), int(command[2]), int(command[3]))
 	var orientation = STRING_TO_ORIENTATION.get(command[4], Vector3())
-	orientation.x *= -1
 	return { "type":"position", "position": position, "orientation": orientation }
 
 static func decode_block_command(command):
