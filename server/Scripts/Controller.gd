@@ -2,7 +2,6 @@ extends Spatial
 
 const Robot = preload("res://Scripts/Robot.gd")
 const Server = preload("res://Scripts/Server.gd")
-const SaveManager = preload("res://Scripts/SaveManager.gd")
 
 var server: Server
 var selected_robot_socket_id = -1

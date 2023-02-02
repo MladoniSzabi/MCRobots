@@ -1,8 +1,6 @@
 extends Node
 
-const Message = preload("res://Scripts/Message.gd")
 const Orientation = preload("res://Scripts/Orientation.gd")
-const SaveManager = preload("res://Scripts/SaveManager.gd")
 
 var id = 0
 var position := Vector3()

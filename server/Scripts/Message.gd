@@ -40,10 +40,10 @@ const ORIENTATION_TO_STRING = {
 	Orientation.ORIENTATION_WEST: "west"
 }
 
-static func encode_position(pos):
+func encode_position(pos):
 	return str(-pos.x) + " " + str(pos.y) + " " + str(pos.z)
 
-static func encode_move_command(params):
+func encode_move_command(params):
 	if params == "forward":
 		return "w".to_utf8()
 	elif params == "back":
@@ -53,14 +53,14 @@ static func encode_move_command(params):
 	elif params == "right":
 		return "d".to_utf8()
 
-static func encode_init_command(params):
+func encode_init_command(params):
 	var retval =  "i " + \
 		encode_position(params.position) + " " + \
 		ORIENTATION_TO_STRING[params.orientation] + " "+ \
 		params.mode
 	return retval.to_utf8()
 
-static func encode(command, params):
+func encode(command, params):
 	if command == "init":
 		return encode_init_command(params)
 	if command == "move":
@@ -69,12 +69,12 @@ static func encode(command, params):
 		print("Command not understood: ", command)
 		return PoolByteArray()
 
-static func decode_position_command(command):
+func decode_position_command(command):
 	var position = Vector3(-int(command[1]), int(command[2]), int(command[3]))
 	var orientation = STRING_TO_ORIENTATION.get(command[4], Vector3())
 	return { "type":"position", "position": position, "orientation": orientation }
 
-static func decode_block_command(command):
+func decode_block_command(command):
 	var position = Vector3(-int(command[1]), int(command[2]), int(command[3]))
 	var block = BLOCK_NAME_TO_ID["unknown_block"]
 	if command[4] == "none":
@@ -83,10 +83,10 @@ static func decode_block_command(command):
 		block = BLOCK_NAME_TO_ID[command[4]]
 	return { "type": "block", "position": position, "block": block }
 
-static func decode_init_command(command):
+func decode_init_command(command):
 	return { "type": "init", "id": int(command[1])}
 
-static func decode(message):
+func decode(message):
 	var encoded_data = message.get_string_from_utf8().split(", ")
 	if encoded_data[0] == "init":
 		return decode_init_command(encoded_data)

@@ -18,6 +18,11 @@ config/name="Server"
 run/main_scene="res://TestWorld.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Message="*res://Scripts/Message.gd"
+SaveManager="*res://Scripts/SaveManager.gd"
+
 [input]
 
 forward={
