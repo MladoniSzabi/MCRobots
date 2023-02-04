@@ -40,6 +40,8 @@ const ORIENTATION_TO_STRING = {
 	Orientation.ORIENTATION_WEST: "west"
 }
 
+var unidentified_blocks = []
+
 func encode_position(pos):
 	return str(-pos.x) + " " + str(pos.y) + " " + str(pos.z)
 
@@ -81,6 +83,10 @@ func decode_block_command(command):
 		block = GridMap.INVALID_CELL_ITEM
 	elif command[4] in BLOCK_NAME_TO_ID:
 		block = BLOCK_NAME_TO_ID[command[4]]
+	else:
+		if not command[4] in  unidentified_blocks:
+			print("Block of type ", command[4], " does not exist")
+			unidentified_blocks.append(command[4])
 	return { "type": "block", "position": position, "block": block }
 
 func decode_init_command(command):
