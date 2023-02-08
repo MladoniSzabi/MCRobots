@@ -40,8 +40,8 @@ func on_block_received(var block: int, var location: Vector3):
 	$World.set_cell_item(location.x, location.y, location.z, block)
 
 func on_robot_moved(var old_position: Vector3, var new_position: Vector3, var new_orientation: Vector3):
-	$World.set_cell_item(old_position.x, old_position.y, old_position.z, $World.INVALID_CELL_ITEM)
-	$World.set_cell_item(new_position.x, new_position.y, new_position.z, $World.ROBOT_TILE, $World.ORIENTATION_TO_ORTHOGONAL_INDEX[new_orientation])
+	$World.set_tile(old_position, $World.INVALID_CELL_ITEM)
+	$World.set_tile(new_position, $World.ROBOT_TILE, new_orientation)
 
 func on_client_connected(socket_id, robot):
 	# Add the robot to the world and listen to its blocks
@@ -51,6 +51,6 @@ func on_client_connected(socket_id, robot):
 
 func on_client_disconnected(socket_id, robot):
 	# Remove the robot from the world
-	$World.set_cell_item(robot.position.x, robot.position.y, robot.position.z, $World.INVALID_CELL_ITEM)
+	$World.set_tile(robot.position, $World.INVALID_CELL_ITEM)
 	SaveManager.save_robot(robot)
 	pass
