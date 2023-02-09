@@ -3,6 +3,10 @@ extends Camera
 var previous_robot_transform = [Vector3(), Vector3()]
 const ZOOM_STEP = 0.8
 const ZOOM_STEP_FINE = 0.1
+const ROTATION_SPEED = 0.05
+
+var original_mouse_pos = null
+var original_transformation : Transform = Transform()
 
 func _ready():
 	pass
@@ -29,3 +33,14 @@ func _input(event):
 		var forward = global_transform.basis.z
 		var zoom = global_transform.origin.move_toward(global_translation + forward, step)
 		global_transform.origin = zoom
+	elif event.is_action_pressed("rotate_camera"):
+		var mouse_pos = get_viewport().get_mouse_position()
+		original_mouse_pos = mouse_pos
+		original_transformation = global_transform
+	if event is InputEventMouseMotion:
+		if Input.is_action_pressed("rotate_camera"):
+			var ie = event as InputEventMouseMotion
+			var mouse_pos_diff = ie.position - original_mouse_pos
+			var dir_to_look_at = original_transformation.basis.y * -mouse_pos_diff.y * ROTATION_SPEED + \
+				original_transformation.basis.x * mouse_pos_diff.x * ROTATION_SPEED - original_transformation.basis.z * 10
+			look_at(original_transformation.origin + dir_to_look_at, original_transformation.basis.y)
