@@ -12,6 +12,6 @@ script = ExtResource( 2 )
 
 [node name="BulidingPlacer" parent="World" instance=ExtResource( 4 )]
 
-[node name="Camera" type="Camera" parent="."]
+[node name="Camera" type="Camera" parent="World"]
 transform = Transform( 1, 0, 0, 0, 0.900918, 0.433989, 0, -0.433989, 0.900918, 0, 3.94117, 4.66088 )
 script = ExtResource( 3 )
