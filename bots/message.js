@@ -1,3 +1,4 @@
+const PathFollowStrategy = import("path_follower")
 const RemoteControlStrategy = import("remote_control_strategy")
 const DiggingStrategy = import("digging_strategy")
 const VectorImport = import("minecraft_classes.Vector")
@@ -7,40 +8,38 @@ const Vector = VectorImport.Vector
 class Message {
 
     static orientation_to_string(orientation) {
-        if(orientation.equals(VectorImport.ORIENTATION_NORTH))
+        if (orientation.equals(VectorImport.ORIENTATION_NORTH))
             return "north"
-        if(orientation.equals(VectorImport.ORIENTATION_SOUTH))
+        if (orientation.equals(VectorImport.ORIENTATION_SOUTH))
             return "south"
-        if(orientation.equals(VectorImport.ORIENTATION_WEST))
+        if (orientation.equals(VectorImport.ORIENTATION_WEST))
             return "west"
-        if(orientation.equals(VectorImport.ORIENTATION_EAST))
+        if (orientation.equals(VectorImport.ORIENTATION_EAST))
             return "east"
         return ""
     }
 
     static string_to_orientation(orientation_string) {
-        if(orientation_string == "north")
+        if (orientation_string == "north")
             return VectorImport.ORIENTATION_NORTH
-        if(orientation_string == "south")
+        if (orientation_string == "south")
             return VectorImport.ORIENTATION_SOUTH
-        if(orientation_string == "west")
+        if (orientation_string == "west")
             return VectorImport.ORIENTATION_WEST
-        if(orientation_string == "east")
+        if (orientation_string == "east")
             return VectorImport.ORIENTATION_EAST
-        return new VectorImport.Orientation(new Vector(0,0,0))
+        return new VectorImport.Orientation(new Vector(0, 0, 0))
     }
 
     static encode_surrounding(surrounding) {
-        
+
         let messages = []
         let message = "position, " + Turtle.get_spatial_data().position.toString() + ", " + Message.orientation_to_string(Turtle.get_spatial_data().orientation)
         messages.push(message)
 
-        for(let coords in surrounding) {
-            console.log("coord", coords)
+        for (let coords in surrounding) {
             message = "block, " + coords + ", "
 
-            console.log(surrounding[coords])
             if (surrounding[coords]) {
                 message += String(surrounding[coords]["name"]) + ", "
             } else {
@@ -52,7 +51,7 @@ class Message {
     }
 
     static encode(message_type, ...params) {
-        if(message_type == "init") {
+        if (message_type == "init") {
             return "init, " + String(params[0])
         }
 
@@ -65,14 +64,16 @@ class Message {
         let tokens = message.split(" ")
         let position = new Vector(Number(tokens[1]), Number(tokens[2]), Number(tokens[3]))
         let orientation = Message.string_to_orientation(tokens[4])
-        
+
         let strategy = null
-        if(tokens[5] == "rc") {
+        if (tokens[5] == "rc") {
             strategy = new RemoteControlStrategy()
-        } else if(tokens[5] == "dig") {
+        } else if (tokens[5] == "dig") {
             strategy = new DiggingStrategy()
+        } else if (tokens[5] == "follow") {
+            strategy = new PathFollowStrategy()
         }
-        
+
         return {
             type: "init",
             spatial_data: {
@@ -81,6 +82,15 @@ class Message {
             },
             strategy: strategy
         }
+    }
+
+    static decode_follow_command(message) {
+        let tokens = message.split(" ")
+        let path = []
+        for (let i = 1; i < tokens.length; i += 3) {
+            path.push(new Vector(Number(tokens[i]), Number(tokens[i + 1]), Number(tokens[i + 2])))
+        }
+        return { type: "follow", path: path }
     }
 
     static decode(message) {
@@ -96,6 +106,8 @@ class Message {
             return { type: "movement", direction: "right" }
         if (message[0] == "i")
             return Message.decode_init_command(message)
+        if (message[0] == "f")
+            return Message.decode_follow_command(message)
 
         return { type: "unknown" }
     }
