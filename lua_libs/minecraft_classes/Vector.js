@@ -64,10 +64,10 @@ class Orientation {
     direction_vector = null
 
     constructor(vector) {
-        if(vector) {
+        if (vector) {
             this.direction_vector = vector
         } else {
-            this.direction_vector = new Vector(1,0,0)
+            this.direction_vector = new Vector(1, 0, 0)
         }
     }
 
@@ -91,7 +91,7 @@ class Orientation {
 
     equals(other_orientation) {
         // Check if they both point to the same vector first since its quicker
-        if(this.direction_vector == other_orientation.direction_vector) {
+        if (this.direction_vector == other_orientation.direction_vector) {
             return true
         }
 
@@ -116,4 +116,5 @@ export default {
     ORIENTATION_EAST: ORIENTATION_EAST,
     ORIENTATION_UP: ORIENTATION_UP,
     ORIENTATION_DOWN: ORIENTATION_DOWN,
+    ORIENTATIONS_XZ: ORIENTATIONS_XZ
 }
