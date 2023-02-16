@@ -62,11 +62,19 @@ func encode_init_command(params):
 		params.mode
 	return retval.to_utf8()
 
+func encode_follow_command(path: PoolVector3Array):
+	var retval = "f"
+	for pos in path:
+		retval += " " + encode_position(pos)
+	return retval.to_utf8()
+
 func encode(command, params):
 	if command == "init":
 		return encode_init_command(params)
 	if command == "move":
 		return encode_move_command(params)
+	if command == "follow":
+		return encode_follow_command(params)
 	else:
 		print("Command not understood: ", command)
 		return PoolByteArray()

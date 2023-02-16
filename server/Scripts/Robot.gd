@@ -61,7 +61,7 @@ func receive_message(var payload):
 		socket.put_packet(Message.encode("init", {
 			"position": position,
 			"orientation": orientation,
-			"mode": "rc"
+			"mode": "follow"
 		}))
 	elif message.type == "position":
 		emit_signal("robot_moved", self.position, message.position, message.orientation)
@@ -73,6 +73,9 @@ func receive_message(var payload):
 
 func get_socket_id() -> int:
 	return socket.get_instance_id()
+
+func follow_path(var path: PoolVector3Array):
+	socket.put_packet(Message.encode("follow", path))
 
 func move(var direction: String):
 	socket.put_packet(Message.encode("move", direction))
