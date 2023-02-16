@@ -142,7 +142,7 @@ function Array.map(this, arguments)
     return __javascript_not_implemented()
 end
 function Array.pop(this, arguments)
-    return __javascript_not_implemented()
+    return __lua_environment.table.remove(this.__value)
 end
 function Array.propertyIsEnumerable(this, arguments)
     return __javascript_not_implemented()
