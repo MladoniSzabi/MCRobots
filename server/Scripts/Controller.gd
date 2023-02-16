@@ -12,7 +12,25 @@ func _ready():
 	server = Server.new()
 	server.connect("on_client_connected", self, "on_client_connected")
 	server.connect("on_client_disconnected", self, "on_client_disconnected")
+	$World/BulidingPlacer.connect("construct_building", self, "on_bulding_constructed")
 	add_child(server)
+
+func on_bulding_constructed(building_cells, building):
+	var builder_robot = null
+	var robot_path = []
+	var robot_path_length = 99999
+	for robot in server.robots.values():
+		var path = $World.find_path($World.world_to_map(building.translation), robot.position)
+		if path.size() < robot_path_length:
+			robot_path = path
+			robot_path_length = path.size()
+			builder_robot = robot
+	
+	if builder_robot:
+		print(robot_path)
+		builder_robot.follow_path(robot_path)
+	else:
+		print("No robot has a clear path to the building")
 
 func select_robot(robot_id: int):
 	if selected_robot_id != -1:
@@ -44,7 +62,7 @@ func on_client_connected(socket_id: int, robot: Robot):
 	# Add the robot to the world and listen to its blocks
 	robot.connect("found_block", self, "on_block_received")
 	robot.connect("robot_moved", self, "on_robot_moved")
-	select_robot(socket_id)
+	#select_robot(socket_id)
 
 func on_client_disconnected(socket_id: int, robot: Robot):
 	# Remove the robot from the world
