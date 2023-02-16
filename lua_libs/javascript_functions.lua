@@ -153,21 +153,24 @@ javascript.console = {}
 function javascript.console.log(arguments)
     -- global tostring is used by print function so need to set it here
     --_G.tostring = __lua_environment.tostring
+    local f = io.open("output.txt", "a")
+    local retval = ""
     for i = 1, #arguments do
         if __lua_environment.type(arguments[i]) == 'table' and arguments[i].toString then
             local toPrint = arguments[i].toString()
             if toPrint.__value then
-                __lua_environment.print(toPrint.__value)
+                retval = retval .. __lua_environment.tostring(toPrint.__value)
             else
-                __lua_environment.print(toPrint)
+                retval = retval .. __lua_environment.tostring(toPrint)
             end
         else
-            __lua_environment.print(arguments[i])
+            retval = retval .. __lua_environment.tostring(arguments[i])
         end
+        retval = retval .. " "
     end
-    if (#arguments == 0) then
-        __lua_environment.print()
-    end
+    __lua_environment.print(retval)
+    f:write(retval .. '\n')
+    f:close()
     -- delete tostring from global since it is not part of javascript
     --_G.tostring = nil
 end
