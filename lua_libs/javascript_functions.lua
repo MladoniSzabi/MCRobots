@@ -43,6 +43,7 @@ function javascript.__prepare_environment()
     _G.String = __lua_environment.require('javascript_types.String')
     _G.Object = __lua_environment.require('javascript_types.Object')
     _G.Array = __lua_environment.require('javascript_types.Array')
+    _G.Math = __lua_environment.require('javascript_types.Math')
 
     _G.null = {
         __type = String('null'),
