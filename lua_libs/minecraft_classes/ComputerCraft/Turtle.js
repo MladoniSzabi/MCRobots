@@ -20,21 +20,21 @@ class Turtle {
 
     static record_surrounding() {
         let retval = Turtle.inspectUp()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = null
         }
 
         retval = Turtle.inspect()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
         }
 
         retval = Turtle.inspectDown()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = null
@@ -43,7 +43,7 @@ class Turtle {
 
     static record_forward() {
         retval = Turtle.inspect()
-        if(!("error" in retval)) {
+        if (!("error" in retval)) {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = retval
         } else {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
@@ -64,15 +64,99 @@ class Turtle {
         return spatial_data
     }
 
-    static craft(limit=64) {
-        let (success, err) = __lua_environment.turtle.craft$notable(limit.__value)
+    static craft(limit = 64) {
+        let(success, err) = __lua_environment.turtle.craft$notable(limit.__value)
         return success ? '' : String(err)
     }
 
-    static forward() {
-        let (success, err) = __lua_environment.turtle.forward$notable()
+    static look_in_direction(target_direction) {
+        if (target_direction.equals(new Vector(0, 0, 0))) {
+            return
+        }
 
-        if(success) {
+        if (target_direction.x != 0) {
+            target_direction.x = target_direction.x / Math.abs(target_direction.x)
+        }
+
+        if (target_direction.y != 0) {
+            target_direction.y = target_direction.y / Math.abs(target_direction.y)
+        }
+
+        if (target_direction.z != 0) {
+            target_direction.z = target_direction.z / Math.abs(target_direction.z)
+        }
+
+        let turtle_orientation = Turtle.get_spatial_data().orientation
+        let turtle_orientation_index
+        for (let i = 0; i < VectorImport.ORIENTATIONS_XZ.length; i++) {
+            let o = VectorImport.ORIENTATIONS_XZ[i]
+            if (o.equals(turtle_orientation.direction_vector)) {
+                turtle_orientation_index = i
+                break
+            }
+        }
+
+        let orientation_to_block_index
+        for (let i = 0; i < VectorImport.ORIENTATIONS_XZ.length; i++) {
+            let o = VectorImport.ORIENTATIONS_XZ[i]
+            if (o.equals(target_direction)) {
+                orientation_to_block_index = i
+                break
+            }
+        }
+
+        let orientation_index_change = (turtle_orientation_index - orientation_to_block_index) % 4
+        if (orientation_index_change == 1) {
+            Turtle.turnRight()
+        }
+        if (orientation_index_change == 3) {
+            Turtle.turnLeft()
+        }
+        if (orientation_index_change == 2) {
+            Turtle.turnRight()
+            Turtle.turnRight()
+        }
+    }
+
+    static move_to(target_position) {
+        let curr_pos = Turtle.get_spatial_data().position
+
+        if (curr_pos.equals(target_position)) {
+            return true
+        }
+
+        let target_x = new Vector(target_position.x, curr_pos.y, curr_pos.z)
+        Turtle.look_in_direction(target_x.sub(curr_pos))
+
+        while (curr_pos.x != target_position.x) {
+            if (Turtle.forward() != "") {
+                return false
+            }
+            curr_pos = Turtle.get_spatial_data().position
+        }
+
+        while (curr_pos.y != target_position.y) {
+            if (Turtle.up() != "") {
+                return false
+            }
+            curr_pos = Turtle.get_spatial_data().position
+        }
+
+        Turtle.look_in_direction(target_position.sub(curr_pos))
+        while (curr_pos.z != target_position.z) {
+            if (Turtle.forward() != "") {
+                return false
+            }
+            curr_pos = Turtle.get_spatial_data().position
+        }
+
+        return true
+    }
+
+    static forward() {
+        let(success, err) = __lua_environment.turtle.forward$notable()
+
+        if (success) {
             spatial_data.position = spatial_data.position.add(spatial_data.orientation.direction_vector)
             Turtle.record_surrounding()
         }
@@ -81,9 +165,9 @@ class Turtle {
     }
 
     static back() {
-        let (success, err) = __lua_environment.turtle.back$notable()
+        let(success, err) = __lua_environment.turtle.back$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.sub(spatial_data.orientation.direction_vector)
             Turtle.record_surrounding()
         }
@@ -92,9 +176,9 @@ class Turtle {
     }
 
     static up() {
-        let (success, err) = __lua_environment.turtle.up$notable()
+        let(success, err) = __lua_environment.turtle.up$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)
             Turtle.record_surrounding()
         }
@@ -103,9 +187,9 @@ class Turtle {
     }
 
     static down() {
-        let (success, err) = __lua_environment.turtle.down$notable()
+        let(success, err) = __lua_environment.turtle.down$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.position = spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)
             Turtle.record_surrounding()
         }
@@ -114,9 +198,9 @@ class Turtle {
     }
 
     static turnLeft() {
-        let (success, err) = __lua_environment.turtle.turnLeft$notable()
+        let(success, err) = __lua_environment.turtle.turnLeft$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.orientation = spatial_data.orientation.turn_left()
             Turtle.record_forward()
         }
@@ -125,9 +209,9 @@ class Turtle {
     }
 
     static turnRight() {
-        let (success, err) = __lua_environment.turtle.turnRight$notable()
+        let(success, err) = __lua_environment.turtle.turnRight$notable()
 
-        if(success) {
+        if (success) {
             spatial_data.orientation = spatial_data.orientation.turn_right()
             Turtle.record_forward()
         }
@@ -136,8 +220,8 @@ class Turtle {
     }
 
     static dig(side = null) {
-        let (success, err) = __lua_environment.turtle.dig$notable(side.__value || undefined)
-        if(success) {
+        let(success, err) = __lua_environment.turtle.dig$notable(side.__value || undefined)
+        if (success) {
             blocks[(spatial_data.position.add(spatial_data.orientation.direction_vector)).toString()] = null
             return ''
         }
@@ -145,8 +229,8 @@ class Turtle {
     }
 
     static digUp(side = null) {
-        let (success, err) = __lua_environment.turtle.digUp$notable(side.__value || undefined)
-        if(success) {
+        let(success, err) = __lua_environment.turtle.digUp$notable(side.__value || undefined)
+        if (success) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_UP.direction_vector)).toString()] = null
             return ''
         }
@@ -154,8 +238,8 @@ class Turtle {
     }
 
     static digDown(side = null) {
-        let (success, err) = __lua_environment.turtle.digDown$notable(side.__value || undefined)
-        if(success) {
+        let(success, err) = __lua_environment.turtle.digDown$notable(side.__value || undefined)
+        if (success) {
             blocks[(spatial_data.position.add(VectorImport.ORIENTATION_DOWN.direction_vector)).toString()] = null
             return ''
         }
@@ -163,32 +247,32 @@ class Turtle {
     }
 
     static place(text = "") {
-        let (success, err) = __lua_environment.turtle.place$notable(text.__value)
+        let(success, err) = __lua_environment.turtle.place$notable(text.__value)
         return success ? '' : String(err)
     }
 
     static placeUp(text = "") {
-        let (success, err) = __lua_environment.turtle.placeUp$notable(text.__value)
+        let(success, err) = __lua_environment.turtle.placeUp$notable(text.__value)
         return success ? '' : String(err)
     }
 
     static placeDown(text = "") {
-        let (success, err) = __lua_environment.turtle.placeDown$notable(text.__value)
+        let(success, err) = __lua_environment.turtle.placeDown$notable(text.__value)
         return success ? '' : String(err)
     }
 
     static drop(count = null) {
-        let (success, err) = __lua_environment.turtle.drop$notable(count.__value || undefined)
+        let(success, err) = __lua_environment.turtle.drop$notable(count.__value || undefined)
         return success ? '' : String(err)
     }
 
     static dropUp(count = null) {
-        let (success, err) = __lua_environment.turtle.dropUp$notable(count.__value || undefined)
+        let(success, err) = __lua_environment.turtle.dropUp$notable(count.__value || undefined)
         return success ? '' : String(err)
     }
 
     static dropDown(count = null) {
-        let (success, err) = __lua_environment.turtle.dropDown$notable(count.__value || undefined)
+        let(success, err) = __lua_environment.turtle.dropDown$notable(count.__value || undefined)
         return success ? '' : String(err)
     }
 
@@ -231,32 +315,32 @@ class Turtle {
     }
 
     static attack(side = null) {
-        let (success, err) = __lua_environment.turtle.attack$notable(side.__value || undefined)
+        let(success, err) = __lua_environment.turtle.attack$notable(side.__value || undefined)
         return success ? '' : String(err)
     }
 
     static attackUp(side = null) {
-        let (success, err) = __lua_environment.turtle.attackUp$notable(side.__value || undefined)
+        let(success, err) = __lua_environment.turtle.attackUp$notable(side.__value || undefined)
         return success ? '' : String(err)
     }
 
     static attackDown(side = null) {
-        let (success, err) = __lua_environment.turtle.attackDown$notable(side.__value || undefined)
+        let(success, err) = __lua_environment.turtle.attackDown$notable(side.__value || undefined)
         return success ? '' : String(err)
     }
 
     static suck(count = 64) {
-        let (success, err) = __lua_environment.turtle.suck$notable(count.__value)
+        let(success, err) = __lua_environment.turtle.suck$notable(count.__value)
         return success ? '' : String(err)
     }
 
     static suckUp(count = 64) {
-        let (success, err) = __lua_environment.turtle.suckUp$notable(count.__value)
+        let(success, err) = __lua_environment.turtle.suckUp$notable(count.__value)
         return success ? '' : String(err)
     }
 
     static suckDown(count = 64) {
-        let (success, err) = __lua_environment.turtle.suckDown$notable(count.__value)
+        let(success, err) = __lua_environment.turtle.suckDown$notable(count.__value)
         return success ? '' : String(err)
     }
 
@@ -266,7 +350,7 @@ class Turtle {
     }
 
     static refuel(count = 1) {
-        let (success, err) = __lua_environment.turtle.refuel$notable(count.__value)
+        let(success, err) = __lua_environment.turtle.refuel$notable(count.__value)
         return success ? '' : String(err)
     }
 
@@ -288,29 +372,29 @@ class Turtle {
     }
 
     static equip() {
-        let (success, err) = __lua_environment.turtle.equipLeft$notable()
+        let(success, err) = __lua_environment.turtle.equipLeft$notable()
         return success ? '' : String(err)
     }
 
     static inspect() {
-        let (success, info) = __lua_environment.turtle.inspect$notable()
-        if(success)
-            return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
-        return {error: "Could not inspect"}
+        let(success, info) = __lua_environment.turtle.inspect$notable()
+        if (success)
+            return __lua_environment.type(info) == 'string'.__value ? { info: info } : Object(info)
+        return { error: "Could not inspect" }
     }
 
     static inspectUp() {
-        let (success, info) = __lua_environment.turtle.inspectUp$notable()
-        if(success)
-            return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
-        return {error: "Could not inspect"}
+        let(success, info) = __lua_environment.turtle.inspectUp$notable()
+        if (success)
+            return __lua_environment.type(info) == 'string'.__value ? { info: info } : Object(info)
+        return { error: "Could not inspect" }
     }
 
     static inspectDown() {
-        let (success, info) = __lua_environment.turtle.inspectDown$notable()
-        if(success)
-            return __lua_environment.type(info) == 'string'.__value ? {info: info} : Object(info)
-        return {error: "Could not inspect"}
+        let(success, info) = __lua_environment.turtle.inspectDown$notable()
+        if (success)
+            return __lua_environment.type(info) == 'string'.__value ? { info: info } : Object(info)
+        return { error: "Could not inspect" }
     }
 
     static getItemDetail(slot, detailed = false) {
