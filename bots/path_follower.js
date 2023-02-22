@@ -1,6 +1,4 @@
-const Turtle = import("minecraft_classes.Turtle")
-const VectorImport = import("minecraft_classes.Vector")
-const Vector = VectorImport.Vector
+const Robot = import("minecraft_classes.Robot")
 
 class PathFollowStrategy {
 
@@ -31,7 +29,7 @@ class PathFollowStrategy {
         }
 
         let next_block = this.path.pop()
-        if (!Turtle.move_to(next_block)) {
+        if (!Robot.move_to(next_block)) {
             this.path = []
             return false
         }

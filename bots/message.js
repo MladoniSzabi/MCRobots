@@ -2,7 +2,7 @@ const PathFollowStrategy = import("path_follower")
 const RemoteControlStrategy = import("remote_control_strategy")
 const DiggingStrategy = import("digging_strategy")
 const VectorImport = import("minecraft_classes.Vector")
-const Turtle = import("minecraft_classes.Turtle")
+const Robot = import("minecraft_classes.Robot")
 const Vector = VectorImport.Vector
 
 class Message {
@@ -31,22 +31,19 @@ class Message {
         return new VectorImport.Orientation(new Vector(0, 0, 0))
     }
 
-    static encode_surrounding(surrounding) {
+    static encode_surrounding(new_block_location, new_block_value) {
 
         let messages = []
-        let message = "position, " + Turtle.get_spatial_data().position.toString() + ", " + Message.orientation_to_string(Turtle.get_spatial_data().orientation)
+        let message = "position, " + Robot.get_spatial_data().position.toString() + ", " + Message.orientation_to_string(Robot.get_spatial_data().orientation)
+        messages.push(message)
+        message = "block, " + new_block_location.toString() + ", "
+        if (new_block_value != null) {
+            message += String(new_block_value["name"]) + ", "
+        } else {
+            message += "none"
+        }
         messages.push(message)
 
-        for (let coords in surrounding) {
-            message = "block, " + coords + ", "
-
-            if (surrounding[coords]) {
-                message += String(surrounding[coords]["name"]) + ", "
-            } else {
-                message += "none, "
-            }
-            messages.push(message)
-        }
         return messages
     }
 
@@ -56,7 +53,7 @@ class Message {
         }
 
         if (message_type == "surrounding") {
-            return Message.encode_surrounding(params[0])
+            return Message.encode_surrounding(params[0], params[1])
         }
     }
 

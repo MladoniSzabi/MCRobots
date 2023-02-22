@@ -1,4 +1,4 @@
-const Turtle = import("minecraft_classes.Turtle")
+const Robot = import("minecraft_classes.Robot")
 
 class RemoteControlStrategy {
     run(command) {
@@ -8,16 +8,16 @@ class RemoteControlStrategy {
 
         if (command.type == "movement") {
             if (command.direction == 'forward') {
-                Turtle.forward()
+                Robot.forward()
             }
             else if (command.direction == 'left') {
-                Turtle.turnLeft()
+                Robot.turn_left()
             }
             else if (command.direction == 'backwards') {
-                Turtle.back()
+                Robot.back()
             }
             else if (command.direction == 'right') {
-                Turtle.turnRight()
+                Robot.turn_right()
             }
         }
 

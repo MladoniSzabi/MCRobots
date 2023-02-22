@@ -1,10 +1,10 @@
-const Turtle = import("minecraft_classes.Turtle")
+const Robot = import("minecraft_classes.Robot")
 
 const LINE_COUNT = 8
 const ROW_COUNT = 8 - 1
 
 class DiggingStrategy {
-    
+
     isRunning = false
     goLeft = true
 
@@ -17,55 +17,55 @@ class DiggingStrategy {
             return true
         }
 
-        for(let i = 0; i < LINE_COUNT; i++) {
+        for (let i = 0; i < LINE_COUNT; i++) {
 
-            if(Turtle.getFuelLevel() < LINE_COUNT*ROW_COUNT*2) {
-                Turtle.select(0)
-                Turtle.refuel(3)
+            if (Robot.get_fuel_level() < LINE_COUNT * ROW_COUNT * 2) {
+                Robot.select(0)
+                Robot.refuel(3)
             }
 
-            for(let j = 0; j < ROW_COUNT; j++) {
-                Turtle.dig()
-                Turtle.forward()
+            for (let j = 0; j < ROW_COUNT; j++) {
+                Robot.dig()
+                Robot.forward()
             }
 
-            if(i !=  LINE_COUNT - 1) {
-                if(this.goLeft) {
-                    Turtle.turnLeft()
+            if (i != LINE_COUNT - 1) {
+                if (this.goLeft) {
+                    Robot.turn_left()
                 } else {
-                    Turtle.turnRight()
+                    Robot.turn_right()
                 }
 
-                Turtle.dig()
-                Turtle.forward()
+                Robot.dig()
+                Robot.forward()
 
-                if(this.goLeft) {
-                    Turtle.turnLeft()
+                if (this.goLeft) {
+                    Robot.turn_left()
                 } else {
-                    Turtle.turnRight()
+                    Robot.turn_right()
                 }
 
                 this.goLeft = !this.goLeft
             }
         }
 
-        Turtle.turnLeft()
-        Turtle.turnLeft()
-        Turtle.select(1)
-        Turtle.place()
+        Robot.turn_left()
+        Robot.turn_left()
+        Robot.select(1)
+        Robot.place()
 
-        for(let j = 2; j < 16; j++) {
-            Turtle.select(j)
-            Turtle.drop()
+        for (let j = 2; j < 16; j++) {
+            Robot.select(j)
+            Robot.drop()
         }
 
-        let error = Turtle.digDown()
-        if(error != '') {
+        let error = Robot.dig_down()
+        if (error != '') {
             this.isRunning = false
             console.log(error)
             return true
         }
-        Turtle.down()
+        Robot.down()
 
         return false
     }

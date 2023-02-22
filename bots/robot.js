@@ -1,11 +1,11 @@
 
 const WebSocket = import("minecraft_classes.WebSocket")
-const Turtle = import("minecraft_classes.Turtle")
+const Robot = import("minecraft_classes.Robot")
 const Message = import("message")
 
 const SERVER_ADDRESS = "ws://localhost:9999"
 
-class Robot {
+class RobotController {
 
     socket = null
     strategy = null
@@ -25,9 +25,17 @@ class Robot {
         this.initialise()
     }
 
+    on_block_changed(new_block_location, new_block_value) {
+        let messages = Message.encode("surrounding", new_block_location, new_block_value)
+        for (let message of messages) {
+            this.socket.send(message)
+        }
+    }
+
     initialise() {
         // Command should be `init {robot_id}` but since we don't have a filesystem API yet and only one robot
         // hardcode robot ID to 0
+        Robot.add_block_listener(this)
         this.socket.send(Message.encode("init", "0"))
         let response = this.socket.receive(1)
         if (!response.message) {
@@ -36,7 +44,7 @@ class Robot {
         }
 
         let init_command = Message.decode(response.message)
-        Turtle.set_spatial_data(init_command.spatial_data)
+        Robot.set_spatial_data(init_command.spatial_data)
         this.strategy = init_command.strategy
 
     }
@@ -52,24 +60,11 @@ class Robot {
             if (this.strategy) {
                 this.is_idle = this.strategy.run(command)
             }
-
-            if (!this.is_idle) {
-                this.send_blocks()
-            }
-            //console.log(Turtle.get_spatial_data().position)
         }
 
         this.socket.close()
     }
-
-    send_blocks() {
-        let messages = Message.encode("surrounding", Turtle.flush_blocks())
-        for(let message of messages) {
-            this.socket.send(message)
-        }
-    }
-
 }
 
-let robot = new Robot()
+let robot = new RobotController()
 robot.run()

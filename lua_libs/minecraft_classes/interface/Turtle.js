@@ -1,7 +1,4 @@
 class ITurtle {
-    static flush_blocks() { }
-    static set_spatial_data(new_spatial_data) { }
-    static get_spatial_data() { }
     static craft(limit = 64) { }
     static forward() { }
     static back() { }
@@ -21,9 +18,6 @@ class ITurtle {
     static select(slot) { }
     static getItemCount(slot = null) { }
     static getItemSpace(slot = null) { }
-    static detect() { }
-    static detectUp() { }
-    static detectDown() { }
     static compare() { }
     static compareUp() { }
     static compareDown() { }
