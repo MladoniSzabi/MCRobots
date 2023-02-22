@@ -47,13 +47,13 @@ func encode_position(pos):
 
 func encode_move_command(params):
 	if params == "forward":
-		return "w".to_utf8()
+		return "rw".to_utf8()
 	elif params == "back":
-		return "s".to_utf8()
+		return "rs".to_utf8()
 	elif params == "left":
-		return "a".to_utf8()
+		return "ra".to_utf8()
 	elif params == "right":
-		return "d".to_utf8()
+		return "rd".to_utf8()
 
 func encode_init_command(params):
 	var retval =  "i " + \
@@ -66,6 +66,10 @@ func encode_follow_command(path: PoolVector3Array):
 	var retval = "f"
 	for pos in path:
 		retval += " " + encode_position(pos)
+	return retval.to_utf8()
+
+func encode_dig_command(rows: int, lines: int, depth: int):
+	var retval = "d " + String(rows) + " " + String(lines) + " " + String(depth)
 	return retval.to_utf8()
 
 func encode(command, params):

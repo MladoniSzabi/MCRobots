@@ -8,7 +8,6 @@ const SERVER_ADDRESS = "ws://localhost:9999"
 class RobotController {
 
     socket = null
-    strategy = null
     is_erroring = false
     is_idle = false
 
@@ -33,9 +32,9 @@ class RobotController {
     }
 
     initialise() {
+        Robot.add_block_listener(this)
         // Command should be `init {robot_id}` but since we don't have a filesystem API yet and only one robot
         // hardcode robot ID to 0
-        Robot.add_block_listener(this)
         this.socket.send(Message.encode("init", "0"))
         let response = this.socket.receive(1)
         if (!response.message) {
@@ -45,7 +44,6 @@ class RobotController {
 
         let init_command = Message.decode(response.message)
         Robot.set_spatial_data(init_command.spatial_data)
-        this.strategy = init_command.strategy
 
     }
 
@@ -53,12 +51,14 @@ class RobotController {
         while (!this.is_erroring) {
             let response = this.socket.receive(this.is_idle ? 3 : 0)
             let command = Message.decode(response.message)
-            if (command.type == "change_strategy") {
-                this.strategy = command.new_strategy
-            }
+            if (command != null) {
 
-            if (this.strategy) {
-                this.is_idle = this.strategy.run(command)
+                this.is_idle = false
+                if (command.run() == false) {
+                    this.is_erroring = true
+                }
+            } else {
+                this.is_idle = true
             }
         }
 
@@ -66,5 +66,5 @@ class RobotController {
     }
 }
 
-let robot = new RobotController()
-robot.run()
+let controller = new RobotController()
+controller.run()

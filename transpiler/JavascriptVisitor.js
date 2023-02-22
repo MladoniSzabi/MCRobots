@@ -16,7 +16,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
                 this.visitChildren(ctx).join('\n')
         }
 
-        if(this.isTranspilingRobot) {
+        if (this.isTranspilingRobot) {
             return 'local __js = require "minecraft_classes.load_classes"\n' +
                 '__js.__prepare_environment()\n' +
                 this.visitChildren(ctx).join('\n')
@@ -162,7 +162,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
                         .join('') + '\n' +
                     property.body +
                     '\nend\n'
-                if(property.isStatic) {
+                if (property.isStatic) {
                     propertyImplementations += ctx.class_name.text + '.' + property.name + ' = function(__javascript_arguments) return ' +
                         ctx.class_name.text + '.__internal_methods.' + property.name + '(nil, __javascript_arguments) end\n'
                 }
@@ -285,7 +285,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Return_Statement.
     visitReturn_Statement(ctx) {
-        if(ctx.expression) {
+        if (ctx.expression) {
             return 'return ' + this.visit(ctx.expression);
         }
         return 'return'
@@ -678,7 +678,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
 
     // Visit a parse tree produced by JavascriptParser#Arguments_Rule.
     visitArguments_Rule(ctx) {
-        if(ctx.parentCtx.no_table) {
+        if (ctx.parentCtx.no_table) {
             return '(' + this.visitChildren(ctx).filter(x => x !== undefined).join(', ') + ')'
         }
         return '({' + this.visitChildren(ctx).filter(x => x !== undefined).join(', ') + '})'
@@ -719,7 +719,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
     visitElement_List(ctx) {
         let arr = this.visitChildren(ctx)
         let arrayElements = []
-        if(arr !== null) {
+        if (arr !== null) {
             arrayElements = arr.filter(x => x !== undefined)
         }
         return arrayElements
@@ -786,8 +786,8 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
             if (v == undefined) {
                 continue
             }
-            if(v.expanded) {
-                for(let variable of v.variable_name) {
+            if (v.expanded) {
+                for (let variable of v.variable_name) {
                     variable_names.push(variable)
                 }
                 variable_values.push(v.variable_value)
@@ -823,7 +823,7 @@ export class JavascriptVisitorImplementation extends JavascriptVisitor {
         let variable_names = this.visit(ctx.variable_names)
         let variable_value = this.visit(ctx.variable_value)
 
-        return {variable_name: variable_names, variable_value, expanded: true}
+        return { variable_name: variable_names, variable_value, expanded: true }
     }
 
     // Visit a parse tree produced by JavascriptParser#Variables_To_Expand

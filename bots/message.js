@@ -1,6 +1,6 @@
-const PathFollowStrategy = import("path_follower")
-const RemoteControlStrategy = import("remote_control_strategy")
-const DiggingStrategy = import("digging_strategy")
+const PathFollowerCommand = import("path_follower_command")
+const RemoteControlCommand = import("remote_control_command")
+const DiggingCommand = import("digging_command")
 const VectorImport = import("minecraft_classes.Vector")
 const Robot = import("minecraft_classes.Robot")
 const Vector = VectorImport.Vector
@@ -62,22 +62,12 @@ class Message {
         let position = new Vector(Number(tokens[1]), Number(tokens[2]), Number(tokens[3]))
         let orientation = Message.string_to_orientation(tokens[4])
 
-        let strategy = null
-        if (tokens[5] == "rc") {
-            strategy = new RemoteControlStrategy()
-        } else if (tokens[5] == "dig") {
-            strategy = new DiggingStrategy()
-        } else if (tokens[5] == "follow") {
-            strategy = new PathFollowStrategy()
-        }
-
         return {
             type: "init",
             spatial_data: {
                 position: position,
                 orientation: orientation
-            },
-            strategy: strategy
+            }
         }
     }
 
@@ -87,26 +77,45 @@ class Message {
         for (let i = 1; i < tokens.length; i += 3) {
             path.push(new Vector(Number(tokens[i]), Number(tokens[i + 1]), Number(tokens[i + 2])))
         }
-        return { type: "follow", path: path }
+        return new PathFollowerCommand(path)
+    }
+
+    static decode_rc_command(message) {
+        if (message[1] == "w") {
+            return new RemoteControlCommand("forward")
+        }
+        else if (message[1] == "s") {
+            return new RemoteControlCommand("backwards")
+        }
+        else if (message[1] == "a") {
+            return new RemoteControlCommand("left")
+        }
+        else if (message[1] == "d") {
+            return new RemoteControlCommand("right")
+        }
+        return null
+    }
+
+    static decode_dig_command(message) {
+        let tokens = message.split(" ")
+        return new DiggingCommand(Number(tokens[1]), Number(tokens[2]), Number(tokens[3]))
     }
 
     static decode(message) {
         if (!message)
-            return { type: "empty" }
-        if (message == "w")
-            return { type: "movement", direction: "forward" }
-        if (message == "s")
-            return { type: "movement", direction: "backwards" }
-        if (message == "a")
-            return { type: "movement", direction: "left" }
-        if (message == "d")
-            return { type: "movement", direction: "right" }
-        if (message[0] == "i")
+            return null
+        if (message[0] == "r") {
+            return Message.decode_rc_command(message)
+        } else if (message[0] == "i") {
             return Message.decode_init_command(message)
-        if (message[0] == "f")
+        } else if (message[0] == "f") {
             return Message.decode_follow_command(message)
+        } else if (message[0] == "d") {
+            return Message.decode_dig_command(message)
+        }
 
-        return { type: "unknown" }
+        console.log("ERROR: Unknown command: ", message)
+        return null
     }
 }
 
