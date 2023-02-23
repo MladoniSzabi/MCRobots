@@ -39,7 +39,6 @@ func is_in_bounds(vec3):
 
 func setup_astar():
 	
-	print(bounds)
 	# The bounds have changed so our ids are not valid anymore
 	# Delete all nodes and set up again
 	astar.clear()
@@ -95,8 +94,6 @@ func should_update_bounds(vec):
 	return need_to_update_bounds
 
 func find_path(var from: Vector3, var to: Vector3) -> PoolVector3Array:
-	print(from)
-	print(to)
 	return astar.get_point_path(grid_coord_to_astar_id(from), grid_coord_to_astar_id(to))
 
 func save(file_name):

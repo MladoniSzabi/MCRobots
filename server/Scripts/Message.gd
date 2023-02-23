@@ -112,6 +112,10 @@ func decode(message):
 		return decode_position_command(encoded_data)
 	elif encoded_data[0] == "block":
 		return decode_block_command(encoded_data)
+	elif encoded_data[0] == "success":
+		return {"type": "success"}
+	elif encoded_data[0] == "failure":
+		return {"type": "failure"}
 	else:
 		print("Unknown command " + encoded_data[0])
 		return {}

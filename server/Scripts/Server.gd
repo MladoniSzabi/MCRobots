@@ -36,6 +36,5 @@ func on_client_disconnected(var id: int, var was_clean_close: bool):
 func on_client_connected(var id: int, var protocol: String):
 	# Create robot class, add it to the dictionary and tell the world to add it visually
 	var robot = Robot.new(server.get_peer(id))
-	add_child(robot)
 	robots[id] = robot
 	emit_signal("on_client_connected", id, robot)

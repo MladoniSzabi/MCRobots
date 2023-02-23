@@ -48,6 +48,15 @@ class Message {
     }
 
     static encode(message_type, ...params) {
+
+        if (message_type == "success") {
+            return "success"
+        }
+
+        if (message_type == "failure") {
+            return "failure"
+        }
+
         if (message_type == "init") {
             return "init, " + String(params[0])
         }

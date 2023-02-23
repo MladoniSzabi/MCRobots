@@ -10,6 +10,8 @@ var socket: WebSocketPeer = null
 
 var is_selected := false
 
+var command_queue := []
+
 signal found_block
 signal robot_moved
 
@@ -32,7 +34,6 @@ func _input(event):
 			move("right")
 
 func select(new_is_selected := true):
-	print("Selecting")
 	is_selected = new_is_selected
 
 func save(file_name: String):
@@ -52,30 +53,69 @@ func load(file_name: String):
 	orientation = file.get_var()
 	file.close()
 
+func handle_receive_init(message):
+	self.id = message.id
+	SaveManager.load_robot(self)
+	socket.put_packet(Message.encode("init", {
+		"position": position,
+		"orientation": orientation,
+		"mode": "follow"
+	}))
+
+func handle_receive_position(message):
+	emit_signal("robot_moved", self.position, message.position, message.orientation)
+	self.position = message.position
+	self.orientation = message.orientation
+
+func handle_receive_block(message):
+	# Tell the world about this block so it can be rendered
+	emit_signal("found_block", message.block, message.position)
+
+func handle_receive_success(message):
+	command_queue.pop_front()
+	send_next_command()
+
+func handle_receive_failure(message):
+	print(command_queue)
+	var command = command_queue.front()
+	var command_type = command[0]
+	if command_type == "follow":
+		var path = Array(command[1])
+		command_queue[0] = ["follow", get_parent().find_path(path.front(), position)]
+	elif command_type == "move":
+		command_queue.pop_front()
+		return
+	
+	send_next_command()
+	
+
 func receive_message(var payload):
 	# Decode the message we got over websocket
 	var message = Message.decode(payload)
+	print(message.type)
 	if message.type == "init":
-		self.id = message.id
-		SaveManager.load_robot(self)
-		socket.put_packet(Message.encode("init", {
-			"position": position,
-			"orientation": orientation,
-			"mode": "follow"
-		}))
+		handle_receive_init(message)
 	elif message.type == "position":
-		emit_signal("robot_moved", self.position, message.position, message.orientation)
-		self.position = message.position
-		self.orientation = message.orientation
+		handle_receive_position(message)
 	elif message.type == "block":
-		# Tell the world about this block so it can be rendered
-		emit_signal("found_block", message.block, message.position)
+		handle_receive_block(message)
+	elif message.type == "success":
+		handle_receive_success(message)
+	elif message.type == "failure":
+		handle_receive_failure(message)
 
 func get_socket_id() -> int:
 	return socket.get_instance_id()
 
+func send_next_command():
+	if command_queue.size() > 0:
+		var command = command_queue.front()
+		socket.put_packet(Message.encode(command[0], command[1]))
+
 func follow_path(var path: PoolVector3Array):
-	socket.put_packet(Message.encode("follow", path))
+	command_queue.append(["follow", path])
+	send_next_command()
 
 func move(var direction: String):
-	socket.put_packet(Message.encode("move", direction))
+	command_queue.append(["move", direction])
+	send_next_command()

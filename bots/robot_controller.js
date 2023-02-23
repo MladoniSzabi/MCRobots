@@ -55,7 +55,9 @@ class RobotController {
 
                 this.is_idle = false
                 if (command.run() == false) {
-                    this.is_erroring = true
+                    this.socket.send(Message.encode("failure"))
+                } else {
+                    this.socket.send(Message.encode("success"))
                 }
             } else {
                 this.is_idle = true
