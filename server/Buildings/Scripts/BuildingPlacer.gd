@@ -25,6 +25,21 @@ func get_pos_in_grid_of_building():
 		return pos_in_grid
 	return null
 
+func sort_building_cells(a, b):
+	if a[1] < b[1]:
+		return false
+	if a[1] > b[1]:
+		return true
+	
+	if a[2] < b[2]:
+		return false
+	if a[2] > b[2]:
+		return true
+	
+	if a[0] < b[0]:
+		return false
+	return true
+
 func _input(event : InputEvent):
 	if event is InputEventKey:
 		var ie = event as InputEventKey
@@ -44,10 +59,12 @@ func _input(event : InputEvent):
 			var ie = event as InputEventMouseButton
 			var parent = get_parent() as GridMap
 			var pos_in_grid = parent.world_to_map(placing_bulding.translation)
-			var cells_to_construct = []
-			for cells in placing_bulding.get_used_cells():
-				var cell_type = placing_bulding.get_cell_item(cells[0], cells[1], cells[2])
-				cells_to_construct.push_back([pos_in_grid.x + cells[0], pos_in_grid.y + cells[1], pos_in_grid.z + cells[2], cell_type])
+			var cells = placing_bulding.get_used_cells()
+			cells.sort_custom(self, "sort_building_cells")
+			for i in range(cells.size()):
+				var cell = cells[i]
+				var cell_type = placing_bulding.get_cell_item(cell[0], cell[1], cell[2])
+				cells[i] = [pos_in_grid.x + cell[0], pos_in_grid.y + cell[1], pos_in_grid.z + cell[2], cell_type]
 			
-			emit_signal("construct_building", cells_to_construct, placing_bulding)
+			emit_signal("construct_building", cells, placing_bulding)
 			placing_bulding = null

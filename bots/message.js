@@ -1,6 +1,7 @@
 const PathFollowerCommand = import("path_follower_command")
 const RemoteControlCommand = import("remote_control_command")
 const DiggingCommand = import("digging_command")
+const BuilderCommand = import("builder_command")
 const VectorImport = import("minecraft_classes.Vector")
 const Robot = import("minecraft_classes.Robot")
 const Vector = VectorImport.Vector
@@ -110,6 +111,19 @@ class Message {
         return new DiggingCommand(Number(tokens[1]), Number(tokens[2]), Number(tokens[3]))
     }
 
+    static decode_build_command(message) {
+        let tokens = message.split(", ")
+        let retval = []
+        for (let i = 1; i < tokens.length; i += 4) {
+            let cell = {
+                pos: new Vector(Number(tokens[i]), Number(tokens[i + 1]), Number(tokens[i + 2])),
+                name: tokens[i + 3]
+            }
+            retval.push(cell)
+        }
+        return new BuilderCommand(retval)
+    }
+
     static decode(message) {
         if (!message)
             return null
@@ -121,6 +135,8 @@ class Message {
             return Message.decode_follow_command(message)
         } else if (message[0] == "d") {
             return Message.decode_dig_command(message)
+        } else if (message[0] == "b") {
+            return Message.decode_build_command(message)
         }
 
         console.log("ERROR: Unknown command: ", message)

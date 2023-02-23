@@ -76,7 +76,6 @@ func handle_receive_success(message):
 	send_next_command()
 
 func handle_receive_failure(message):
-	print(command_queue)
 	var command = command_queue.front()
 	var command_type = command[0]
 	if command_type == "follow":
@@ -85,6 +84,8 @@ func handle_receive_failure(message):
 	elif command_type == "move":
 		command_queue.pop_front()
 		return
+	else:
+		command_queue.pop_front()
 	
 	send_next_command()
 	
@@ -92,7 +93,6 @@ func handle_receive_failure(message):
 func receive_message(var payload):
 	# Decode the message we got over websocket
 	var message = Message.decode(payload)
-	print(message.type)
 	if message.type == "init":
 		handle_receive_init(message)
 	elif message.type == "position":
@@ -119,3 +119,6 @@ func follow_path(var path: PoolVector3Array):
 func move(var direction: String):
 	command_queue.append(["move", direction])
 	send_next_command()
+
+func build(var blocks):
+	command_queue.append(["build", blocks])

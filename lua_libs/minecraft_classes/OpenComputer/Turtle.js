@@ -204,10 +204,19 @@ class OpenComputer {
     }
 
     static getItemDetail(slot, detailed = false) {
+        slot = slot + 1
         if (inventory_controller) {
             let side = 1
             return Object(inventory_controller.getStackInSlot$notable(side.__value, slot.__value))
         }
-        return { error: "Inventory controller not installer" }
+        return { error: "Inventory controller not installed" }
+    }
+
+    static getInventorySize() {
+        if (inventory_controller) {
+            let side = 1
+            return Number(inventory_controller.getInventorySize(side.__value))
+        }
+        return 0
     }
 }

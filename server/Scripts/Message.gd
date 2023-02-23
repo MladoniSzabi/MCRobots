@@ -26,6 +26,8 @@ const BLOCK_NAME_TO_ID = {
 	"minecraft:oak_sapling": 19,
 }
 
+var ID_TO_BLOCK_NAME = {}
+
 const STRING_TO_ORIENTATION = {
 	"north": Orientation.ORIENTATION_NORTH,
 	"south": Orientation.ORIENTATION_SOUTH,
@@ -41,6 +43,10 @@ const ORIENTATION_TO_STRING = {
 }
 
 var unidentified_blocks = []
+
+func _init():
+	for block in BLOCK_NAME_TO_ID:
+		ID_TO_BLOCK_NAME[BLOCK_NAME_TO_ID[block]] = block
 
 func encode_position(pos):
 	return str(-pos.x) + " " + str(pos.y) + " " + str(pos.z)
@@ -72,6 +78,13 @@ func encode_dig_command(rows: int, lines: int, depth: int):
 	var retval = "d " + String(rows) + " " + String(lines) + " " + String(depth)
 	return retval.to_utf8()
 
+func encode_build_command(cells: Array):
+	var retval = "b"
+	for c in cells:
+		retval += ", " + String(-c[0]) + ", " + String(c[1]) + ", " + String(c[2]) + ", " + ID_TO_BLOCK_NAME[c[3]]
+	
+	return retval.to_utf8()
+
 func encode(command, params):
 	if command == "init":
 		return encode_init_command(params)
@@ -79,9 +92,10 @@ func encode(command, params):
 		return encode_move_command(params)
 	if command == "follow":
 		return encode_follow_command(params)
-	else:
-		print("Command not understood: ", command)
-		return PoolByteArray()
+	if command == "build":
+		return encode_build_command(params)
+	print("Command not understood: ", command)
+	return PoolByteArray()
 
 func decode_position_command(command):
 	var position = Vector3(-int(command[1]), int(command[2]), int(command[3]))

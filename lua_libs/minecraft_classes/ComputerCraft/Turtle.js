@@ -155,7 +155,7 @@ class Turtle {
     }
 
     static getSelectedSlot() {
-        return Number(__lua_environment.turtle.getSelectedSlot$notable())
+        return Number(__lua_environment.turtle.getSelectedSlot$notable()) - 1
     }
 
     static getFuelLimit() {
@@ -190,7 +190,12 @@ class Turtle {
     }
 
     static getItemDetail(slot, detailed = false) {
+        slot = slot + 1
         return Object(__lua_environment.turtle.getItemDetail$notable(slot.__value, detailed.__value))
+    }
+
+    static getInventorySize() {
+        return 16
     }
 
 }

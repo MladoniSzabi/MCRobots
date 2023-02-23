@@ -28,6 +28,7 @@ func on_bulding_constructed(building_cells, building):
 	
 	if builder_robot:
 		builder_robot.follow_path(robot_path)
+		builder_robot.build(building_cells)
 	else:
 		print("No robot has a clear path to the building")
 
@@ -62,7 +63,7 @@ func on_client_connected(socket_id: int, robot: Robot):
 	$World.add_child(robot)
 	robot.connect("found_block", self, "on_block_received")
 	robot.connect("robot_moved", self, "on_robot_moved")
-	select_robot(socket_id)
+	#select_robot(socket_id)
 
 func on_client_disconnected(socket_id: int, robot: Robot):
 	# Remove the robot from the world

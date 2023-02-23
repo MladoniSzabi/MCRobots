@@ -123,9 +123,16 @@ class Robot {
         }
 
         while (curr_pos.y != target_position.y) {
-            if (Robot.up() != "") {
-                return false
+            if (curr_pos.y > target_position.y) {
+                if (Robot.down() != "") {
+                    return false
+                }
+            } else {
+                if (Robot.up() != "") {
+                    return false
+                }
             }
+
             curr_pos = Robot.get_spatial_data().position
         }
 
@@ -200,7 +207,7 @@ class Robot {
     }
     static place(text = "") {
         let item = Turtle.getItemDetail(Turtle.getSelectedSlot())
-        if (item == "") {
+        if ("error" in item) {
             item = null
         } else {
             item = item.name
@@ -215,7 +222,7 @@ class Robot {
     }
     static place_up(text = "") {
         let item = Turtle.getItemDetail(Turtle.getSelectedSlot())
-        if (item == "") {
+        if ("error" in item) {
             item = null
         } else {
             item = item.name
@@ -230,19 +237,51 @@ class Robot {
     }
     static place_down(text = "") {
         let item = Turtle.getItemDetail(Turtle.getSelectedSlot())
-        if (item == "") {
+        if ("error" in item) {
             item = null
         } else {
             item = item.name
         }
 
-        let err = Turtle.placeUp(text)
+        let err = Turtle.placeDown(text)
         if (err == "") {
             Robot.emit_change(spatial_data.position.sub(VectorImport.ORIENTATION_UP.direction_vector), item)
         }
 
         return err
     }
+
+    static select_item(item_name) {
+        for (let i = 0; i < Turtle.getInventorySize(); i++) {
+            if (Robot.get_item_detail(i).name == item_name) {
+                Robot.select(i)
+                return true
+            }
+        }
+        return false
+    }
+
+    static place_item(item_name, text = "") {
+        if (!Robot.select_item(item_name)) {
+            return "Item not found"
+        }
+        return Robot.place(text)
+    }
+
+    static place_item_up(item_name, text = "") {
+        if (!Robot.select_item(item_name)) {
+            return "Item not found"
+        }
+        return Robot.place_up(text)
+    }
+
+    static place_item_down(item_name, text = "") {
+        if (!Robot.select_item(item_name)) {
+            return "Item not found"
+        }
+        return Robot.place_down(text)
+    }
+
     static drop(count = null) {
         return Turtle.drop(count)
     }
@@ -327,6 +366,10 @@ class Robot {
     }
     static get_item_detail(slot, detailed = false) {
         return Turtle.getItemDetail(slot, detailed)
+    }
+
+    static get_inventory_size() {
+        return Turtle.getInventorySize()
     }
 
 }
